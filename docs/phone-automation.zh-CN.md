@@ -48,13 +48,29 @@ adb shell input keyevent BACK
 adb shell am start -n <包名>/<Activity>   # 或：monkey -p <包名> -c android.intent.category.LAUNCHER 1
 ```
 
+## 分屏：让 Termux 一直留在屏幕上（折叠屏、平板）
+
+屏幕大的话，可以把 App 放在右半边，Termux 留在左半边。这样你能一直看着 Claude 在做什么，随时打断。先打开 App，查到它的任务 ID，然后在 Termux 位于前台时，把 App 移到侧边：
+
+```sh
+adb shell am stack list | grep <包名>          # 输出形如 "taskId=12345: <包名>/..."
+adb shell dumpsys activity service SystemUIService WMShell splitscreen moveToSideStage <taskId> 1
+# 1 = 右边（或下边），0 = 左边（或上边）
+adb shell dumpsys activity service SystemUIService WMShell splitscreen exitSplitScreen <taskId>   # 退出分屏
+```
+
+在 Pixel 10 Pro Fold 的内屏上，分屏后 Termux 占 x 0–1026，App 占 x 1050–2076。`uiautomator` 给的仍然是整个屏幕的坐标，所以 `look.sh` 和 `input tap` 都不用改。
+
+- **主要适合折叠屏和平板。** 普通手机的半个屏幕太窄，多数 App 会挤得没法用。普通手机上还是让 App 占满全屏，用完再切回 Termux。
+- **当心键盘。** Termux 有焦点时，它的软键盘会挡住**左右两边**的下半部分，而 App 的「继续」「检查」这类按钮常常就在那里。点屏幕下方之前先看一眼截图，或者先把键盘收起来。
+
 ## 踩过的坑
 
 - **点击之间要停一下。** 很多 App 每次点击后会播动画，动画期间收到的点击会被丢掉。配对题里间隔 0.6 秒的点击丢了一部分，间隔 1.3 秒就都正常。点完一串之后，再跑一次 `look.sh` 确认状态，不要想当然。
 - **没看过的页面别闭着眼睛连点。** 课程结束后，我用一个循环一直点屏幕底部正中的按钮，结果连续点过了好几页奖励和推销页面（送宝石、免费试用、「邀请好友加入家庭方案」），事后已经说不清每一下选了什么。非例行的页面要逐页读清楚，按按钮的文字去点。
 - **`uiautomator dump` 不是什么都能看到。** 画在 canvas 或游戏视图里的内容只会显示成一个大节点，这种情况要看截图。
 - **坐标是屏幕像素。** `uiautomator` 给的 bounds 和 `input tap` 用的是同一套坐标，但缩小后的截图预览不是，所以坐标要取自 dump。
-- **App 会占住屏幕。** Claude 操作期间你不能用手机，中途切走会让 Claude 点到别的 App 上。结束后用 `monkey -p com.termux -c android.intent.category.LAUNCHER 1` 切回 Termux。
+- **不分屏的话，App 会占住整个屏幕。** Claude 操作期间你不能用手机，中途切走会让 Claude 点到别的 App 上。结束后用 `monkey -p com.termux -c android.intent.category.LAUNCHER 1` 切回 Termux。折叠屏和平板请用上面的分屏。
 - **有些 App 禁止截屏**（`FLAG_SECURE`，银行、支付类常见），截出来是黑的，但 `uiautomator` 可能仍然读得到元素。
 - **声音碰不到。** Claude 听不到手机发出的声音，依赖声音的操作需要有文字替代方案。
 

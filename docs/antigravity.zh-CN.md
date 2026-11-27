@@ -35,7 +35,7 @@ Android 上不能用 `--mode auto`：它依赖终端沙箱，这里没有，`agy
 
 ## 说明文件和记忆
 
-`agy` 会读启动目录里的 `AGENTS.md` 和 `GEMINI.md`，以及对所有会话生效的 `~/.gemini/GEMINI.md`。把 [phone/AGENTS.zh-CN.md](../phone/AGENTS.zh-CN.md) 放进项目目录。如果想把另一个 agent 已经摸清的经验（比如 Claude Code 的记忆文件）交给它，把内容复制进 `~/.gemini/GEMINI.md` 即可。复制前先读一遍：这些内容会发给另一家服务商，不想分享的先删掉。
+`agy` 会读启动目录里的 `AGENTS.md` 和 `GEMINI.md`，以及对所有会话生效的 `~/.gemini/GEMINI.md`。把 [phone/AGENTS.zh-CN.md](../phone/AGENTS.zh-CN.md) 放进项目目录。想对所有会话都生效的备注（比如你这台手机的特殊情况），写进 `~/.gemini/GEMINI.md`。
 
 第一次在某个目录启动 `agy` 时，它会问你是否信任这个目录。
 

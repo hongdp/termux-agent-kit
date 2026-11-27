@@ -35,7 +35,7 @@ Unlike Claude Code, `agy` needs no glibc, no binary patching and no wrapper scri
 
 ## Instructions and memory
 
-`agy` reads `AGENTS.md` and `GEMINI.md` from the folder it starts in, and `~/.gemini/GEMINI.md` for every session. Put [phone/AGENTS.md](../phone/AGENTS.md) in the project folder. To share what another agent has already learned about your phone (for example Claude Code's memory files), copy that text into `~/.gemini/GEMINI.md`. Read it first: it goes to another provider, so take out anything you don't want to share.
+`agy` reads `AGENTS.md` and `GEMINI.md` from the folder it starts in, and `~/.gemini/GEMINI.md` for every session. Put [phone/AGENTS.md](../phone/AGENTS.md) in the project folder. Notes that should apply to every session, such as quirks of your phone, go in `~/.gemini/GEMINI.md`.
 
 The first time you start `agy` in a folder it asks whether you trust it.
 

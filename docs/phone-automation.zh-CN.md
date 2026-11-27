@@ -18,7 +18,11 @@ adb shell dumpsys SurfaceFlinger --display-id
 
 ## 循环：看、想、做
 
-Claude 每一步都先截屏、读一遍界面元素，决定做什么，再执行。下面这个小脚本负责「看」：保存截图，并列出所有带文字、带描述或可点击的元素，附上它们的点击中心坐标（屏幕像素）：
+agent 每一步都先看屏幕，决定做什么，再执行。
+
+**默认用截图来看。** `adb exec-out screencap -p > $TMPDIR/s.png` 用不了一秒，人能看到的它都能看到，包括图标、图片和网页内容。
+
+**需要时再加上界面元素列表。** `uiautomator dump` 会把屏幕上的元素列成文字，带精确的点击坐标，也比图片省 token。但只要屏幕上有动画，它就要 10 秒以上，而且画布、游戏和网页视图里的内容它基本看不到。画面静止、又需要精确坐标或者要读大量文字时再用它。下面这个小脚本会保存截图，并列出所有带文字、带描述或可点击的元素，附上它们的点击中心坐标（屏幕像素）：
 
 ```sh
 #!/data/data/com.termux/files/usr/bin/bash
@@ -36,7 +40,7 @@ function attr(s,n){ if (match(s, n "=\"[^\"]*\"")) return substr(s,RSTART+length
   printf "%-38s | %-22s | %-24s %s (%d,%d)\n", substr(t,1,38), substr(d,1,22), substr(id,1,24), (c=="true"?"CLICK":""), (p[2]+p[4])/2, (p[3]+p[5])/2 }'
 ```
 
-大多数时候光看这份文字列表就能操作，比看截图省很多 token。只有列表说不清的时候才需要看截图，比如只有图标的按钮、游戏类画面，或者要确认结果。
+列表能正常读出来的时候，光看文字往往就够操作了。列表说不清的地方（比如只有图标的按钮、游戏类画面），或者要确认结果时，再回去看截图。
 
 操作命令：
 
@@ -82,7 +86,7 @@ phone/act.sh -u swipe 540 1800 540 600          # -u 同时打印界面元素列
 | Claude Code | Sonnet 5.5，high | Claude App | 到达结账页，没有下单 | 约 1.5 分钟 |
 | Antigravity CLI 1.5.18 | Gemini 4 Hydrogen，high | Chrome 里的网页 | 到达结账页，没有下单 | 约 5 分钟 |
 
-用时只能粗略参考。每个 agent 只跑了一次；Gemini 那次开始时购物车里已经有一件商品，而且它在做选择前翻看了更多菜单。更早一次用更大的 Claude 模型花了四分多钟，因为它想用 `uiautomator dump` 把整个菜单读一遍；现在说明文件里写了不要这样做。
+每个 agent 只跑了一次，用时只能粗略参考。
 
 ## 分屏：让 Termux 一直留在屏幕上（折叠屏、平板）
 
@@ -110,7 +114,6 @@ adb shell dumpsys activity service SystemUIService WMShell splitscreen exitSplit
 - **不要用 `monkey` 打开 App。** `adb shell monkey -p <包名> ...` 拿来启动 App 很方便，但它退出时会打开自动旋转（折叠屏上连当前折叠状态的那一项也会改）。用户的屏幕方向锁定反复被解开，直到所有启动都改成 `am start -n <包名>/<Activity>` 才好。
 - **输入文字用粘贴。** `input text` 会经过输入法。自动纠错把 “Tang Shui” 改成了 “Tango Shui”；在中文输入状态下，文字进了候选栏而不是输入框。先设置剪贴板再发 `keyevent 279`（粘贴）可以避开这两个问题。
 - **想快就用截图，少用 `uiautomator dump`。** 屏幕上有动画时，一次 dump 要 10 秒以上。有一次为了读一个很长的菜单，逐页 dump 花了三分多钟；改用截图加 App 自带的搜索后，同样的任务只用了一分半。
-- **重复跑之前先清理现场。** 购物车里留着上一次的商品，会改变下一次看到的内容，agent 还得决定怎么处理它。
 - **有些 App 禁止截屏**（`FLAG_SECURE`，银行、支付类常见），截出来是黑的，但 `uiautomator` 可能仍然读得到元素。
 - **声音处理不了。** Claude 听不到手机发出的声音，依赖声音的操作需要有文字替代方案。
 

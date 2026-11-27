@@ -118,5 +118,5 @@ adb shell dumpsys activity service SystemUIService WMShell splitscreen exitSplit
 
 ## 限制
 
-- 无线调试要连 Wi-Fi；重启或换网络后连接端口会变，所以没法长期无人值守。
+- 无线调试要连 Wi-Fi；重启或换网络后连接端口会变。`adb-connect.sh` 可以重新连上，但重启之后仍然需要有人先解锁手机。
 - 锁屏时用不了。

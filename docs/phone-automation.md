@@ -118,5 +118,5 @@ On the Pixel 10 Pro Fold's inner display this gives Termux x 0–1026 and the ap
 
 ## Limits
 
-- Wireless debugging needs Wi-Fi, and the connect port changes after a reboot or network change, so this can't run unattended for long.
+- Wireless debugging needs Wi-Fi, and the connect port changes after a reboot or network change. `adb-connect.sh` reconnects, but after a reboot someone still has to unlock the phone first.
 - It doesn't work while the screen is locked.

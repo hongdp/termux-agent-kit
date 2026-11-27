@@ -15,18 +15,19 @@
 
 ## 2. Termux 和 Termux:API
 
-两个 App 要从**同一个来源**安装：都用 [Termux 的 GitHub releases](https://github.com/termux/termux-app/releases) 和 [Termux:API 的 releases](https://github.com/termux/termux-api/releases)，或者都用 F-Droid。不同来源的签名不一样，混装的话两个 App 互相连不上。本文用的是 GitHub 版本。
+两个 App 要从**同一个来源**安装：都用 [Termux 的 GitHub releases](https://github.com/termux/termux-app/releases) 和 [Termux:API 的 releases](https://github.com/termux/termux-api/releases)，或者都用 F-Droid。不同来源的签名不一样，混装的话两个 App 互相连不上。本文用的是 GitHub 版本。Google Play 版的 Termux 对程序的启动方式有额外限制，本仓库的 Claude Code 安装脚本没有在它上面测试过；用那个版本的话，可以看专门为它写的 [termux-coding-agents](https://github.com/bobbymac/termux-coding-agents)。
 
 在 Termux 里：
 
 ```sh
 apt-get update && apt-get full-upgrade -y     # 把所有包升级到互相匹配的版本
-pkg install -y git android-tools termux-api tmux
+pkg install -y git android-tools termux-api tmux nmap
 ```
 
 - `android-tools` 提供 `adb`。
 - `termux-api` 提供 `termux-clipboard-set`，agent 靠它输入文字。它需要 Termux:API 这个 App。
 - `tmux` 让 agent 在 Termux 切到后台时继续运行。
+- `nmap` 让 `adb-connect.sh` 在无线调试端口变化后能重新找到它。
 
 **检查：** `termux-clipboard-set hello && termux-clipboard-get` 输出 `hello`。如果卡住不动，说明 Termux:API App 没装，或者和 Termux 不是同一个来源。
 
@@ -68,7 +69,7 @@ claude                     # 第一次运行时执行 /login
 
 **检查：** `adb devices` 列出 `127.0.0.1:<端口>   device`。
 
-重启、切换 Wi-Fi、或者把无线调试关掉再打开之后，连接端口会变。用新端口重新 `adb connect` 即可，配对不用重做。
+重启、切换 Wi-Fi、或者把无线调试关掉再打开之后，连接端口会变。配对不用重做，只需要新端口：运行 `phone/adb-connect.sh`，它会自己找到端口并重新连上（第一次最多半分钟，之后几秒）。agent 也可以自己运行它。你也可以到无线调试页面上看端口，手动 `adb connect`。
 
 ### 屏幕 ID（折叠屏等多屏设备）
 
@@ -86,7 +87,7 @@ adb exec-out screencap -p > $TMPDIR/s.png; head -c 60 $TMPDIR/s.png
 # 在 termux-agent-kit 目录里执行
 mkdir -p ~/projects/phone
 cp phone/AGENTS.zh-CN.md ~/projects/phone/AGENTS.md
-cp phone/act.sh ~/projects/phone/
+cp phone/act.sh phone/adb-connect.sh ~/projects/phone/
 ln -s AGENTS.md ~/projects/phone/CLAUDE.md      # Claude Code 读的是 CLAUDE.md；这样只需要改一份
 ```
 
@@ -135,6 +136,6 @@ cd ~/projects/phone && claude remote-control --name phone
 | agent 读一个长列表要好几分钟 | 屏幕有动画时 `uiautomator dump` 一次要 10 秒以上 | 让它用截图和 App 自带的搜索（模板里已经写了） |
 | 点击好像没反应 | App 还在播动画 | 用 `./act.sh`，或者两次点击之间等一秒左右 |
 | 截图文件里是 `Multiple displays were found` | 有不止一块屏幕 | 加 `-d <屏幕ID>` |
-| 重启后 `adb devices` 是空的 | 连接端口变了 | `adb connect 127.0.0.1:<新端口>` |
+| 重启后 `adb devices` 是空的 | 连接端口变了 | 在 agent 的目录里运行 `./adb-connect.sh` |
 | `agy` 每条命令都要确认 | Android 上没有沙箱，不能用 auto 模式 | 见 [antigravity.zh-CN.md](antigravity.zh-CN.md#android-上的权限) |
 | 装完包之后 `curl` 坏了 | 升级只做了一半，libcurl 和 openssl 版本不一致 | `apt-get full-upgrade` |

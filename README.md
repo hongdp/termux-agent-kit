@@ -30,6 +30,7 @@ English | [简体中文](README.zh-CN.md)
 - [Before you hand over your phone](#before-you-hand-over-your-phone)
 - [Troubleshooting](#troubleshooting)
 - [Repository layout](#repository-layout)
+- [Related projects](#related-projects)
 - [Contributing](#contributing)
 - [License and disclaimer](#license-and-disclaimer)
 
@@ -80,7 +81,7 @@ The short version. [docs/setup.md](docs/setup.md) has every step with a check af
 ```sh
 # 1. Packages (upgrade first, so all packages are on matching versions)
 apt-get update && apt-get full-upgrade -y
-pkg install -y git android-tools termux-api tmux
+pkg install -y git android-tools termux-api tmux nmap
 
 # 2. An agent (Claude Code shown; for Antigravity CLI see docs/antigravity.md)
 git clone https://github.com/hongdp/termux-agent-kit.git
@@ -94,7 +95,7 @@ adb connect 127.0.0.1:<connect-port>
 
 # 4. A folder with instructions for the agent
 mkdir -p ~/projects/phone
-cp phone/AGENTS.md phone/act.sh ~/projects/phone/
+cp phone/AGENTS.md phone/act.sh phone/adb-connect.sh ~/projects/phone/
 ln -s AGENTS.md ~/projects/phone/CLAUDE.md
 
 # 5. Go
@@ -142,7 +143,7 @@ The ones people hit first. The full table is in [docs/setup.md](docs/setup.md#pi
 | Typed text is wrong or missing | Paste instead of `input text`: `termux-clipboard-set "text"; adb shell input keyevent 279` |
 | `claude remote-control`: "Workspace not trusted" | Start it in a project folder, not the home directory, after running `claude` there once |
 | `grep` / `find` fail inside Claude Code with `invalid ELF header` | Use `command grep` and `command find` |
-| `adb devices` is empty after a reboot | The port changed: `adb connect 127.0.0.1:<new port>` |
+| `adb devices` is empty after a reboot | The port changed: run `./adb-connect.sh` in the agent's folder |
 
 ## Repository layout
 
@@ -153,9 +154,20 @@ claude-termux-update    Update, list versions, roll back
 shim-bash               Shell shim for Claude Code's Bash tool
 phone/AGENTS.md         Instruction template for any agent (also in zh-CN)
 phone/act.sh            Run taps, swipes and pastes, return when the screen settles
+phone/adb-connect.sh    Find the Wireless debugging port again and reconnect adb
 docs/                   Guides, each in English and Simplified Chinese
 docs/media/             Demo GIF used in this README
 ```
+
+## Related projects
+
+Other people are working on the same idea from different angles. If this repo doesn't fit your setup, one of these may:
+
+- [termux-coding-agents](https://github.com/bobbymac/termux-coding-agents) runs Claude Code and other agents in Termux with a different technique that also covers the Google Play build of Termux and keeps Claude Code's own updater. `phone/adb-connect.sh` here follows the port-discovery approach of its `adb-local`.
+- [android-agent](https://github.com/nebigoktug/android-agent) is a CLI and MCP server for letting an agent use Android apps, from a PC or from Termux on the phone.
+- [droidrun](https://github.com/droidrun/droidrun) and [mobile-use](https://github.com/minitap-ai/mobile-use) are standalone frameworks for agents that control phones.
+
+We have read the first one and not used the others; the descriptions come from their own READMEs.
 
 ## Contributing
 

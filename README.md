@@ -60,7 +60,9 @@ Tested 2.1.332 and 2.1.326 on a Pixel 10 Pro Fold (Android 17, kernel 6.12, Term
 
 - In the Bash tool, Claude Code replaces `grep` and `find` with its embedded ugrep and bfs, which re-exec the claude binary under a different argv0. Because `shim-bash` restores bionic's `LD_PRELOAD`, the glibc claude binary fails immediately with `error while loading shared libraries: .../glibc/lib/libc.so: invalid ELF header`. Workaround: use `command grep` and `command find`. The `grep` you use yourself in Termux is not affected. Setting `EMBEDDED_SEARCH_TOOLS=0` does not help (tested). A real fix needs `LD_PRELOAD` removed when the embedded tools start.
 
-## Developing Android apps on the phone
+## Cool things you can do with Claude on Termux
+
+### Build Android apps on the phone itself
 
 With Termux + Gradle + adb to the phone itself (wireless debugging), you can build, install and debug Android apps on the phone, and Claude Code can run the whole "edit → build → install → screenshot to verify" loop by itself. Full guide: [docs/android-dev.md](docs/android-dev.md).
 

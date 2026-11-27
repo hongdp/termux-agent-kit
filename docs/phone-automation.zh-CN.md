@@ -1,8 +1,8 @@
-# 让 Claude 操作手机上的 App
+# 让 agent 操作手机上的 App
 
 [English](phone-automation.md) | 简体中文
 
-Termux 里的 `adb` 连上手机本身以后，Claude Code 就能像人一样操作任何 App：看屏幕，想下一步，然后点击、滑动、打字。不用 root，不用无障碍服务，也不用装别的 App。
+Termux 里的 `adb` 连上手机本身以后，运行在 Termux 里的编程 agent 就能像人一样操作任何 App：看屏幕，想下一步，然后点击、滑动、打字。不用 root，不用无障碍服务，也不用装别的 App。只要 agent 能执行 shell 命令、能读图片就行；本文用 Claude Code 和 Antigravity CLI（Gemini）测试过，下文的“Claude”可以换成你用的任何一个 agent。
 
 在 Pixel 10 Pro Fold（Android 17）上实测过：Claude 打开一个语言学习 App，找到当前进行中的课，从头做到尾，翻译、配对、填空、打字题一道没错。听力题和口语题用 App 自带的「现在不方便听/说」按钮跳过了，因为 Claude 听不到声音，也没法说话。
 
@@ -42,11 +42,47 @@ function attr(s,n){ if (match(s, n "=\"[^\"]*\"")) return substr(s,RSTART+length
 
 ```sh
 adb shell input tap X Y            # 点击（坐标取自 look.sh）
-adb shell input text hello         # 在当前输入框里打字
+termux-clipboard-set "hello"; adb shell input keyevent 279   # 用粘贴来输入文字（见下文）
 adb shell input swipe X1 Y1 X2 Y2 300
 adb shell input keyevent BACK
-adb shell am start -n <包名>/<Activity>   # 或：monkey -p <包名> -c android.intent.category.LAUNCHER 1
+adb shell am start -n <包名>/<Activity>   # 不要用 monkey 启动 App（见下文）
 ```
+
+## 给 agent 的说明文件
+
+agent 需要知道怎么操作手机、该在哪里停下。[phone/AGENTS.zh-CN.md](../phone/AGENTS.zh-CN.md) 是一份模板，写了操作方法和下面这些规则。把它复制到启动 agent 的目录里（Claude Code 用 `CLAUDE.md`，Antigravity CLI 用 `AGENTS.md` 或 `GEMINI.md`），并填好关于你这台手机的一节。
+
+## act.sh：操作后等屏幕稳定
+
+[phone/act.sh](../phone/act.sh) 执行一个或多个操作，屏幕一停止变化就返回，并附上最新截图。它用来替代固定的 `sleep`：固定等待要么太短（点击丢失），要么太长。
+
+```sh
+phone/act.sh tap 540 1200                       # 点击，等屏幕稳定，截图
+phone/act.sh tap 540 300 paste "milk tea" key 66
+phone/act.sh -u swipe 540 1800 540 600          # -u 同时打印界面元素列表
+```
+
+在设置 App 里走同样的四步，它用了 28.8 秒，分开执行点击、sleep、截图要 47.8 秒。
+
+## 直接在手机上发指令（遥控）
+
+不一定要在终端里打字。在 Termux 里启动 agent 并打开遥控，然后在同一台手机上用它自己的 App 或网页和它对话。agent 会打开目标 App 操作，停下时切回它的客户端。
+
+- **Claude Code**：在项目目录里运行 `claude remote-control`（先在这个目录运行一次 `claude`，接受信任提示），然后在 Claude App 里选这台设备新建会话。
+- **Antigravity CLI**：在 `tmux` 里运行 `agy --remote-control`，然后在浏览器里打开它打印的链接。见 [antigravity.zh-CN.md](antigravity.zh-CN.md)。
+
+有两点要知道。agent 的客户端和它操作的 App 轮流占用屏幕，所以要告诉 agent 停下时切回来（模板里写了）。另外，误落在客户端上的点击或按键会把会话停掉：`keyevent 111`（Esc）两次按中了 Claude App 的停止按钮。
+
+## 实测结果
+
+两次用的是同一句提示词，都从手机上的客户端发出：“打开 DoorDash，帮我在最近的糖水（Tong Sui）点一杯奶茶，种类你来选，停在结账页面”。Pixel 10 Pro Fold，折叠状态，只用截图。
+
+| Agent | 模型 | 客户端 | 结果 | 用时 |
+| --- | --- | --- | --- | --- |
+| Claude Code | Sonnet 5.5，high | Claude App | 到达结账页，没有下单 | 约 1.5 分钟 |
+| Antigravity CLI 1.5.18 | Gemini 4 Hydrogen，high | Chrome 里的网页 | 到达结账页，没有下单 | 约 5 分钟 |
+
+用时只能粗略参考。每个 agent 只跑了一次；Gemini 那次开始时购物车里已经有一件商品，而且它选之前把菜单看得更多。更早一次用更大的 Claude 模型花了四分多钟，因为它想用 `uiautomator dump` 把整个菜单读一遍；现在说明文件里写了不要这样做。
 
 ## 分屏：让 Termux 一直留在屏幕上（折叠屏、平板）
 
@@ -70,7 +106,11 @@ adb shell dumpsys activity service SystemUIService WMShell splitscreen exitSplit
 - **没看过的页面别闭着眼睛连点。** 课程结束后，我用一个循环一直点屏幕底部正中的按钮，结果连续点过了好几页奖励和推销页面（送宝石、免费试用、「邀请好友加入家庭方案」），事后已经说不清每一下选了什么。非例行的页面要逐页读清楚，按按钮的文字去点。
 - **`uiautomator dump` 不是什么都能看到。** 画在 canvas 或游戏视图里的内容只会显示成一个大节点，这种情况要看截图。
 - **坐标是屏幕像素。** `uiautomator` 给的 bounds 和 `input tap` 用的是同一套坐标，但缩小后的截图预览不是，所以坐标要取自 dump。
-- **不分屏的话，App 会占住整个屏幕。** Claude 操作期间你不能用手机，中途切走会让 Claude 点到别的 App 上。结束后用 `monkey -p com.termux -c android.intent.category.LAUNCHER 1` 切回 Termux。折叠屏和平板请用上面的分屏。
+- **不分屏的话，App 会占住整个屏幕。** Claude 操作期间你不能用手机，中途切走会让 Claude 点到别的 App 上。结束后用 `adb shell am start -n com.termux/.app.TermuxActivity` 切回 Termux。折叠屏和平板请用上面的分屏。
+- **不要用 `monkey` 打开 App。** `adb shell monkey -p <包名> ...` 拿来启动 App 很方便，但它退出时会打开自动旋转（折叠屏上连当前折叠状态的那一项也会改）。用户的屏幕方向锁定反复被解开，直到所有启动都改成 `am start -n <包名>/<Activity>` 才好。
+- **输入文字用粘贴。** `input text` 会经过输入法。自动纠错把 “Tang Shui” 改成了 “Tango Shui”；在中文输入状态下，文字进了候选栏而不是输入框。先设置剪贴板再发 `keyevent 279`（粘贴）可以避开这两个问题。
+- **想快就用截图，少用 `uiautomator dump`。** 屏幕上有动画时，一次 dump 要 10 秒以上。有一次为了读一个很长的菜单，逐页 dump 花了三分多钟；改用截图加 App 自带的搜索后，同样的任务只用了一分半。
+- **重复跑之前先清理现场。** 购物车里留着上一次的商品，会改变下一次看到的内容，agent 还得决定怎么处理它。
 - **有些 App 禁止截屏**（`FLAG_SECURE`，银行、支付类常见），截出来是黑的，但 `uiautomator` 可能仍然读得到元素。
 - **声音碰不到。** Claude 听不到手机发出的声音，依赖声音的操作需要有文字替代方案。
 

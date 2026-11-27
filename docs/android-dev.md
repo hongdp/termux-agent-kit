@@ -163,7 +163,7 @@ The app under test and Termux share one screen. While Claude runs in Termux, the
 adb shell am start -W -n <pkg>/<activity>
 sleep 3
 adb exec-out screencap -d <display-id> -p > shot.png
-adb shell monkey -p com.termux -c android.intent.category.LAUNCHER 1   # back to Termux
+adb shell am start -n com.termux/.app.TermuxActivity   # back to Termux (not monkey: it turns auto-rotate on)
 ```
 
 Bringing the app to the front takes over your screen, so have Claude announce it before testing.

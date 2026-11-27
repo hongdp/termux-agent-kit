@@ -1,6 +1,6 @@
 <div align="center">
 
-# claude-termux
+# termux-agent-kit
 
 **Run AI coding agents natively on your Android phone, and let them use the phone.**
 
@@ -43,7 +43,7 @@ English | [简体中文](README.zh-CN.md)
 
 </div>
 
-Full recordings in real time: [Claude Code, about 2 min](https://github.com/hongdp/claude-termux/releases/download/demo-videos/claude-code-demo.mp4) · [Antigravity CLI, about 6 min](https://github.com/hongdp/claude-termux/releases/download/demo-videos/antigravity-cli-demo.mp4)
+Full recordings in real time: [Claude Code, about 2 min](https://github.com/hongdp/termux-agent-kit/releases/download/demo-videos/claude-code-demo.mp4) · [Antigravity CLI, about 6 min](https://github.com/hongdp/termux-agent-kit/releases/download/demo-videos/antigravity-cli-demo.mp4)
 
 ## Why
 
@@ -83,8 +83,8 @@ apt-get update && apt-get full-upgrade -y
 pkg install -y git android-tools termux-api tmux
 
 # 2. An agent (Claude Code shown; for Antigravity CLI see docs/antigravity.md)
-git clone https://github.com/hongdp/claude-termux.git
-cd claude-termux && bash install.sh
+git clone https://github.com/hongdp/termux-agent-kit.git
+cd termux-agent-kit && bash install.sh
 
 # 3. adb to the phone itself: turn on Wireless debugging in Developer options.
 #    Keep the pairing dialog open in split screen while you type the code;

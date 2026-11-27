@@ -24,8 +24,8 @@ In Termux (aarch64 only):
 
 ```sh
 pkg install -y git
-git clone https://github.com/hongdp/claude-termux.git
-cd claude-termux && bash install.sh          # latest by default; or: bash install.sh stable
+git clone https://github.com/hongdp/termux-agent-kit.git
+cd termux-agent-kit && bash install.sh          # latest by default; or: bash install.sh stable
 claude                                        # run /login the first time
 ```
 

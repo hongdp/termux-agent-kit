@@ -35,14 +35,14 @@ pkg install -y git android-tools termux-api tmux
 Both agents use files from this repo (the instruction template and `act.sh`), so clone it first:
 
 ```sh
-git clone https://github.com/hongdp/claude-termux.git
-cd claude-termux
+git clone https://github.com/hongdp/termux-agent-kit.git
+cd termux-agent-kit
 ```
 
 **Claude Code:**
 
 ```sh
-bash install.sh            # in the claude-termux folder
+bash install.sh            # in the termux-agent-kit folder
 claude                     # run /login the first time
 ```
 
@@ -83,7 +83,7 @@ If the file starts with `[Warning] Multiple displays were found`, the phone has 
 Start the agent in its own project folder, not in your home directory.
 
 ```sh
-# run from the claude-termux folder
+# run from the termux-agent-kit folder
 mkdir -p ~/projects/phone
 cp phone/AGENTS.md phone/act.sh ~/projects/phone/
 ln -s AGENTS.md ~/projects/phone/CLAUDE.md      # Claude Code reads CLAUDE.md; one file to edit

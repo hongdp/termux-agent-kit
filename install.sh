@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# claude-termux: run the official Claude Code linux-arm64 build natively in Termux.
+# Part of termux-agent-kit: run the official Claude Code linux-arm64 build natively in Termux.
 #
 # Claude Code has no Android build (the npm installer knows the platform key
 # "linux-arm64-android", but that package is not published), and Termux uses
@@ -15,11 +15,11 @@
 set -euo pipefail
 
 if [[ "${PREFIX:-}" != /data/data/com.termux/files/usr ]]; then
-	echo "claude-termux: run this inside Termux" >&2
+	echo "install.sh: run this inside Termux" >&2
 	exit 1
 fi
 if [[ "$(uname -m)" != aarch64 ]]; then
-	echo "claude-termux: only aarch64 is supported (got $(uname -m))" >&2
+	echo "install.sh: only aarch64 is supported (got $(uname -m))" >&2
 	exit 1
 fi
 

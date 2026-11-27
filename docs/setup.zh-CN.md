@@ -35,14 +35,14 @@ pkg install -y git android-tools termux-api tmux
 两个 agent 都要用到本仓库里的文件（说明模板和 `act.sh`），所以先把仓库克隆下来：
 
 ```sh
-git clone https://github.com/hongdp/claude-termux.git
-cd claude-termux
+git clone https://github.com/hongdp/termux-agent-kit.git
+cd termux-agent-kit
 ```
 
 **Claude Code：**
 
 ```sh
-bash install.sh            # 在 claude-termux 目录里执行
+bash install.sh            # 在 termux-agent-kit 目录里执行
 claude                     # 第一次运行时执行 /login
 ```
 
@@ -83,7 +83,7 @@ adb exec-out screencap -p > $TMPDIR/s.png; head -c 60 $TMPDIR/s.png
 在单独的项目目录里启动 agent，不要在主目录里启动。
 
 ```sh
-# 在 claude-termux 目录里执行
+# 在 termux-agent-kit 目录里执行
 mkdir -p ~/projects/phone
 cp phone/AGENTS.zh-CN.md ~/projects/phone/AGENTS.md
 cp phone/act.sh ~/projects/phone/

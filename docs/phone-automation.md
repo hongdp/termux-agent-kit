@@ -1,8 +1,8 @@
-# Letting Claude use apps on your phone
+# Letting an agent use apps on your phone
 
 English | [简体中文](phone-automation.zh-CN.md)
 
-Once `adb` in Termux is connected to the phone itself, Claude Code can operate any app the way a person does: read the screen, decide what to do, then tap, swipe or type. No root, no accessibility service, no extra app.
+Once `adb` in Termux is connected to the phone itself, a coding agent running in Termux can operate any app the way a person does: read the screen, decide what to do, then tap, swipe or type. No root, no accessibility service, no extra app. Any agent that can run shell commands and read images will do; this guide was tested with Claude Code and Antigravity CLI (Gemini), and "Claude" below stands for whichever agent you use.
 
 Tested on a Pixel 10 Pro Fold (Android 17): Claude opened a language-learning app, picked the current lesson and completed it end to end with no wrong answers (translation, matching pairs, fill-in-the-blank and typing exercises). Listening and speaking exercises were skipped with the app's own "can't listen/speak now" buttons, since Claude can't hear audio or speak.
 
@@ -42,11 +42,47 @@ Actions:
 
 ```sh
 adb shell input tap X Y            # tap (coordinates from look.sh)
-adb shell input text hello         # type into the focused field
+termux-clipboard-set "hello"; adb shell input keyevent 279   # type by pasting (see below)
 adb shell input swipe X1 Y1 X2 Y2 300
 adb shell input keyevent BACK
-adb shell am start -n <pkg>/<activity>   # or: monkey -p <pkg> -c android.intent.category.LAUNCHER 1
+adb shell am start -n <pkg>/<activity>   # do not use monkey to launch apps (see below)
 ```
+
+## Give the agent its instructions
+
+The agent needs to know how to operate the phone and where to stop. [phone/AGENTS.md](../phone/AGENTS.md) is a template with the method and the rules below; copy it into the folder you start the agent in (as `CLAUDE.md` for Claude Code, `AGENTS.md` or `GEMINI.md` for Antigravity CLI) and fill in the section about your phone.
+
+## act.sh: act, then wait for the screen
+
+[phone/act.sh](../phone/act.sh) runs one or more actions and returns as soon as the screen stops changing, with a fresh screenshot. It replaces fixed `sleep`s, which are either too short (taps get lost) or too long.
+
+```sh
+phone/act.sh tap 540 1200                       # tap, wait until the screen settles, screenshot
+phone/act.sh tap 540 300 paste "milk tea" key 66
+phone/act.sh -u swipe 540 1800 540 600          # -u also prints the UI element list
+```
+
+In a four-step run through the Settings app it took 28.8 s, against 47.8 s for separate tap, sleep and screenshot commands.
+
+## Send prompts from the phone itself (remote control)
+
+You don't have to type into the terminal. Start the agent in Termux with remote control on, then talk to it from its own app or web page on the same phone. The agent opens the target app, works in it, and switches back to its client when it stops.
+
+- **Claude Code**: `claude remote-control` in a project folder (run `claude` there once first to accept the trust prompt), then start a session on that device from the Claude app.
+- **Antigravity CLI**: `agy --remote-control` inside `tmux`, then open the printed link in a browser. See [antigravity.md](antigravity.md).
+
+Two things to know. The agent's client and the app it drives take turns on screen, so tell the agent to switch back when it stops (the template does). And a stray tap or key event that lands on the client can stop the session: on the phone, `keyevent 111` (Escape) hit the Claude app's stop button twice.
+
+## What we tested
+
+Same prompt both times, sent from the client on the phone: "Open DoorDash, order a milk tea from the nearest Tong Sui, you pick the drink, stop at the checkout page." Pixel 10 Pro Fold, folded, screenshots only.
+
+| Agent | Model | Client | Result | Time |
+| --- | --- | --- | --- | --- |
+| Claude Code | Sonnet 5.5, high | Claude app | Reached checkout, did not order | about 1.5 min |
+| Antigravity CLI 1.5.18 | Gemini 4 Hydrogen, high | Web page in Chrome | Reached checkout, did not order | about 5 min |
+
+Treat the times as rough. Each agent ran once, the Gemini run started with an item already in the cart, and it explored more of the menu before choosing. An earlier Claude run on a larger model took over four minutes because it tried to read the whole menu with `uiautomator dump`; the instruction file now says not to.
 
 ## Split screen: keep Termux visible (foldables and tablets)
 
@@ -70,7 +106,11 @@ On the Pixel 10 Pro Fold's inner display this gives Termux x 0–1026 and the ap
 - **Never blind-tap through screens you haven't read.** After the lesson, a loop that kept tapping the bottom-center button ran through reward and upsell screens (gift gems, a free trial, "add friends to your family plan"), and it was no longer clear which choice each tap had made. Read every non-routine screen and tap the button by its text.
 - **`uiautomator dump` doesn't see everything.** Content drawn in a canvas or game view shows up as one big node. Use the screenshot for those.
 - **Coordinates are screen pixels.** `uiautomator` bounds and `input tap` use the same coordinate space, but a downscaled screenshot preview does not, so take coordinates from the dump.
-- **Without split screen, the app takes over the screen.** You can't use the phone while Claude drives it, and switching away mid-run makes Claude tap the wrong app. Switch back to Termux at the end with `monkey -p com.termux -c android.intent.category.LAUNCHER 1`. On a foldable or tablet, use split screen (above).
+- **Without split screen, the app takes over the screen.** You can't use the phone while Claude drives it, and switching away mid-run makes Claude tap the wrong app. Switch back to Termux at the end with `adb shell am start -n com.termux/.app.TermuxActivity`. On a foldable or tablet, use split screen (above).
+- **Don't launch apps with `monkey`.** `adb shell monkey -p <pkg> ...` is a handy launcher, but when it exits it turns auto-rotate on (on a foldable, for the current fold state too). The user's rotation lock kept coming undone until every launch was changed to `am start -n <pkg>/<activity>`.
+- **Type by pasting.** `input text` goes through the keyboard app. Autocorrect turned "Tang Shui" into "Tango Shui", and in a Chinese input mode the text ended up in the composing bar instead of the field. Setting the clipboard and sending `keyevent 279` (paste) avoids both.
+- **Prefer screenshots to `uiautomator dump` for speed.** A dump takes 10 seconds or more while anything on screen animates. One run spent over three minutes dumping a long menu page by page; with screenshots and the app's own search, the same task took a minute and a half.
+- **Clean up before a repeat run.** A leftover item in a shopping cart changes what the next run sees, and the agent has to decide what to do about it.
 - **Some apps block screenshots** (`FLAG_SECURE`, common in banking and payment apps): screenshots come back black. `uiautomator` may still see the elements.
 - **Audio is out of reach.** Claude can't hear the phone, so anything that depends on sound needs a text alternative.
 

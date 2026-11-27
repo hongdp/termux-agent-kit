@@ -163,7 +163,7 @@ Pixel 10 Pro Fold 的两块屏幕分别是 2076×2152（内屏）和 1080×2364�
 adb shell am start -W -n <pkg>/<activity>
 sleep 3
 adb exec-out screencap -d <display-id> -p > shot.png
-adb shell monkey -p com.termux -c android.intent.category.LAUNCHER 1   # 切回 Termux
+adb shell am start -n com.termux/.app.TermuxActivity   # 切回 Termux（不要用 monkey，它会打开自动旋转）
 ```
 
 App 切到前台时会占用你的屏幕，所以让 Claude 先打招呼再测。

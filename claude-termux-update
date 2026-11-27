@@ -1,0 +1,84 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Download, verify, patch and activate a Claude Code linux-arm64 build.
+# Usage: claude-termux-update [latest|stable|next|<version>]   (default: latest)
+#        claude-termux-update --list     show installed versions
+#        claude-termux-update --rollback switch to the previous installed version
+set -euo pipefail
+
+ROOT="$HOME/.local/share/claude-native"
+LD="$PREFIX/glibc/lib/ld-linux-aarch64.so.1"
+RPATH="$PREFIX/glibc/lib"
+REG="https://registry.npmjs.org/@anthropic-ai%2fclaude-code-linux-arm64"
+KEEP=2 # installed versions to keep, including the current one
+
+mkdir -p "$ROOT"
+cur="$(readlink "$ROOT/current" 2>/dev/null || true)"
+
+installed() {
+	# version dirs, oldest first
+	find "$ROOT" -mindepth 1 -maxdepth 1 -type d -name '[0-9]*' -printf '%f\n' | sort -V
+}
+
+case "${1:-}" in
+	--list)
+		for v in $(installed); do
+			[[ "$v" == "$cur" ]] && echo "* $v" || echo "  $v"
+		done
+		exit 0
+		;;
+	--rollback)
+		prev="$(installed | grep -vxF "$cur" | tail -1)"
+		[[ -n "$prev" ]] || { echo "no other installed version" >&2; exit 1; }
+		ln -sfn "$prev" "$ROOT/current"
+		echo "switched $cur -> $prev"
+		exit 0
+		;;
+esac
+
+want="${1:-latest}"
+meta="$(curl -fsSL "$REG/$want")" || { echo "cannot fetch metadata for '$want'" >&2; exit 1; }
+ver="$(jq -r .version <<<"$meta")"
+url="$(jq -r .dist.tarball <<<"$meta")"
+integrity="$(jq -r .dist.integrity <<<"$meta")"
+
+if [[ "$ver" == "$cur" && -x "$ROOT/$ver/claude" ]]; then
+	echo "claude-termux: $ver is already current"
+	exit 0
+fi
+
+if [[ ! -x "$ROOT/$ver/claude" ]]; then
+	echo "==> downloading $ver"
+	work="$(mktemp -d "$ROOT/.dl.XXXXXX")"
+	trap 'rm -rf "$work"' EXIT
+	curl -fL --progress-bar -o "$work/pkg.tgz" "$url"
+
+	expected="$(sed 's/^sha512-//' <<<"$integrity" | base64 -d | od -An -tx1 -v | tr -d ' \n')"
+	actual="$(sha512sum "$work/pkg.tgz" | cut -d' ' -f1)"
+	if [[ "$integrity" != sha512-* || "$expected" != "$actual" ]]; then
+		echo "integrity check failed for $url" >&2
+		exit 1
+	fi
+
+	tar -xzf "$work/pkg.tgz" -C "$work" package/claude
+	echo "==> patching ELF interpreter -> $LD"
+	patchelf --set-interpreter "$LD" --set-rpath "$RPATH" "$work/package/claude"
+
+	got="$(env -u LD_PRELOAD "$work/package/claude" --version 2>&1 || true)"
+	if [[ "$got" != "$ver "* ]]; then
+		echo "patched binary failed to start: $got" >&2
+		exit 1
+	fi
+	mkdir -p "$ROOT/$ver"
+	mv "$work/package/claude" "$ROOT/$ver/claude"
+fi
+
+ln -sfn "$ver" "$ROOT/current"
+echo "==> active: $ver${cur:+ (was $cur)}"
+
+# prune old versions, never the current one
+mapfile -t old < <(installed | grep -vxF "$ver")
+while ((${#old[@]} > KEEP - 1)); do
+	rm -rf "${ROOT:?}/${old[0]}"
+	echo "    removed ${old[0]}"
+	old=("${old[@]:1}")
+done

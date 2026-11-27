@@ -1,0 +1,29 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# claude-termux wrapper: start the patched glibc Claude Code binary.
+ROOT="$HOME/.local/share/claude-native"
+BIN="$ROOT/current/claude"
+
+case "${1:-}" in
+	update | upgrade | install)
+		# The built-in updater would fetch an unpatched binary that can't start here.
+		shift
+		exec claude-termux-update "$@"
+		;;
+esac
+
+if [ ! -x "$BIN" ]; then
+	echo "claude-termux: no installed version, run: claude-termux-update" >&2
+	exit 1
+fi
+
+# Termux's LD_PRELOAD (bionic termux-exec) makes the glibc loader abort.
+# Save it so the bash shim can restore it for commands Claude runs.
+if [ -n "${LD_PRELOAD:-}" ]; then
+	export CLAUDE_TERMUX_LD_PRELOAD="$LD_PRELOAD"
+fi
+unset LD_PRELOAD
+
+export CLAUDE_CODE_SHELL="$ROOT/shim/bash"
+export DISABLE_AUTOUPDATER=1
+
+exec "$BIN" "$@"

@@ -1,0 +1,7 @@
+#!/data/data/com.termux/files/usr/bin/sh
+# Bash for Claude Code's Bash tool: restore termux-exec so `#!/usr/bin/env ...`
+# scripts and other Termux path rewrites work in commands Claude runs.
+if [ -n "${CLAUDE_TERMUX_LD_PRELOAD:-}" ]; then
+	export LD_PRELOAD="$CLAUDE_TERMUX_LD_PRELOAD"
+fi
+exec /data/data/com.termux/files/usr/bin/bash "$@"

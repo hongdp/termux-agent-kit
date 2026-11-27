@@ -17,6 +17,16 @@ agy models                 # list the models your account can use
 
 The binary lands in `~/.local/bin/agy`. Google's install page still lists only desktop systems, but the installer handles Termux.
 
+## What to expect
+
+The install itself had no technical problems on the test phone. A few things look like errors and aren't:
+
+- Every `agy` command prints `ERROR: logging before google.Init: ... Initialized Android local timezone to ...` first. It is a log line, not a failure.
+- The installer warns that `~/.local/bin` is not in `PATH`. That is what the `export PATH=...` line above fixes; until then, run it as `~/.local/bin/agy`.
+- `--mode auto` prints a warning and continues in the default mode (see below).
+
+Unlike Claude Code, `agy` needs no glibc, no binary patching and no wrapper script, and it has its own `agy update` command (not tried on the phone yet).
+
 ## Permissions on Android
 
 `--mode auto` is not available on Android: it depends on a terminal sandbox that doesn't exist here, and `agy` falls back to asking before every command. For phone automation that means one confirmation per tap.

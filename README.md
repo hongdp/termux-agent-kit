@@ -66,6 +66,10 @@ Tested 2.1.332 and 2.1.326 on a Pixel 10 Pro Fold (Android 17, kernel 6.12, Term
 
 With Termux + Gradle + adb to the phone itself (wireless debugging), you can build, install and debug Android apps on the phone, and Claude Code can run the whole "edit → build → install → screenshot to verify" loop by itself. Full guide: [docs/android-dev.md](docs/android-dev.md).
 
+### Let Claude use apps on your phone
+
+The same local adb connection lets Claude operate any app like a person: screenshot and UI dump to see the screen, then tap, swipe and type. In testing it opened a language-learning app and completed a full lesson by itself. How it works and lessons learned: [docs/phone-automation.md](docs/phone-automation.md). Please respect each app's terms of service.
+
 ## Files
 
 | File | Purpose |

@@ -4,7 +4,7 @@ English | [简体中文](phone-automation.zh-CN.md)
 
 Once `adb` in Termux is connected to the phone itself, a coding agent running in Termux can operate any app the way a person does: read the screen, decide what to do, then tap, swipe or type. No root, no accessibility service, no extra app. Any agent that can run shell commands and read images will do; this guide was tested with Claude Code and Antigravity CLI (Gemini), and "Claude" below stands for whichever agent you use.
 
-Tested on a Pixel 10 Pro Fold (Android 17): Claude opened a language-learning app, picked the current lesson and completed it end to end with no wrong answers (translation, matching pairs, fill-in-the-blank and typing exercises). Listening and speaking exercises were skipped with the app's own "can't listen/speak now" buttons, since Claude can't hear audio or speak.
+Tested on a Pixel 10 Pro Fold (Android 17): Claude opened Duolingo, picked the current lesson and completed it end to end with no wrong answers (translation, matching pairs, fill-in-the-blank and typing exercises). Listening and speaking exercises were skipped with the app's own "can't listen/speak now" buttons, since Claude can't hear audio or speak. It was a fun test and a bad way to study: the streak survived, but the only one who learned anything was the model. We don't recommend it.
 
 > Respect each app's terms of service. Many apps forbid automated use of their service, so use this for your own experiments, testing and accessibility needs, not for farming points or rewards. Don't let Claude make payments, send money or message people on your behalf without checking each step.
 

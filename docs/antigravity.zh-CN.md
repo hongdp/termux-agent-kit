@@ -17,6 +17,16 @@ agy models                 # 列出你的账号能用的模型
 
 二进制装在 `~/.local/bin/agy`。Google 的安装文档目前还只列了桌面系统，但安装脚本能处理 Termux。
 
+## 会遇到什么
+
+在测试手机上，安装本身没有遇到技术问题。有几处看起来像报错，其实不是：
+
+- 每条 `agy` 命令开头都会打印一行 `ERROR: logging before google.Init: ... Initialized Android local timezone to ...`。这只是一行日志，不是失败。
+- 安装脚本会警告 `~/.local/bin` 不在 `PATH` 里。上面那行 `export PATH=...` 就是解决这个的；在那之前可以用 `~/.local/bin/agy` 运行。
+- `--mode auto` 会打印一条警告，然后按默认模式继续（见下文）。
+
+和 Claude Code 不同，`agy` 不需要 glibc，不需要给二进制打补丁，也不需要包装脚本，并且自带 `agy update` 命令（还没在手机上试过）。
+
 ## Android 上的权限
 
 Android 上不能用 `--mode auto`：它依赖终端沙箱，这里没有，`agy` 会退回到每条命令都先询问。用来操作手机的话，就是每点一下都要确认一次。

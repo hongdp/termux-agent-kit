@@ -43,7 +43,7 @@ Termux has been able to do this kind of thing for years, but working in a CLI on
 - **Agents on the phone.** Claude Code runs through the glibc wrapper in this repo. Antigravity CLI has a native Android build.
 - **Prompts from the agent's own app.** Start the agent in Termux with remote control on, then talk to it from the Claude app or the Antigravity web page on the same phone.
 - **Android development on the phone.** The agent edits the code, builds with Gradle, installs over a local adb connection and takes a screenshot to check its work.
-- **Phone automation.** With the same adb connection the agent can open any app, read the screen, tap and type. It can finish a language lesson when you're too busy to keep your streak, or get a food order ready and stop at checkout so you press the final button yourself.
+- **Phone automation.** With the same adb connection the agent can open any app, read the screen, tap and type. It can get a food order ready and stop at checkout so you press the final button yourself. It can even do your Duolingo lesson on a busy day to save your streak. (Not recommended. The owl will be satisfied, but you won't learn a word.)
 
 One prompt both agents handled from start to finish, sent from their client on the phone:
 

@@ -65,19 +65,24 @@ No root and no computer.
 The short version. [docs/setup.md](docs/setup.md) has every step with a check after each one.
 
 ```sh
-# 1. Packages
+# 1. Packages (upgrade first, so all packages are on matching versions)
+apt-get update && apt-get full-upgrade -y
 pkg install -y git android-tools termux-api tmux
 
 # 2. An agent (Claude Code shown; for Antigravity CLI see docs/antigravity.md)
 git clone https://github.com/hongdp/claude-termux.git
 cd claude-termux && bash install.sh
 
-# 3. adb to the phone itself: turn on Wireless debugging in Developer options, then
+# 3. adb to the phone itself: turn on Wireless debugging in Developer options.
+#    Keep the pairing dialog open in split screen while you type the code;
+#    the connect port is a different one, shown on the Wireless debugging page.
 adb pair 127.0.0.1:<pairing-port> <code>
 adb connect 127.0.0.1:<connect-port>
 
 # 4. A folder with instructions for the agent
-mkdir -p ~/projects/phone && cp phone/AGENTS.md ~/projects/phone/CLAUDE.md
+mkdir -p ~/projects/phone
+cp phone/AGENTS.md phone/act.sh ~/projects/phone/
+ln -s AGENTS.md ~/projects/phone/CLAUDE.md
 
 # 5. Go
 cd ~/projects/phone && claude
@@ -121,7 +126,6 @@ The ones people hit first. The full table is in [docs/setup.md](docs/setup.md#pi
 
 | What you see | What to do |
 | --- | --- |
-| Rotation lock keeps turning itself off | Don't launch apps with `adb shell monkey`; use `am start -n <pkg>/<activity>` |
 | Typed text is wrong or missing | Paste instead of `input text`: `termux-clipboard-set "text"; adb shell input keyevent 279` |
 | `claude remote-control`: "Workspace not trusted" | Start it in a project folder, not the home directory, after running `claude` there once |
 | `grep` / `find` fail inside Claude Code with `invalid ELF header` | Use `command grep` and `command find` |

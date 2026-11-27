@@ -45,7 +45,7 @@ Run `agy` in `tmux` so it keeps running when Termux is in the background:
 
 ```sh
 pkg install -y tmux
-tmux new -s agy -c ~/projects/phone-demo 'agy --remote-control --model gemini-4-hydrogen-high'
+tmux new -s agy -c ~/projects/phone 'agy --remote-control --model gemini-4-hydrogen-high'
 # Ctrl+b d detaches; tmux attach -t agy comes back
 ```
 

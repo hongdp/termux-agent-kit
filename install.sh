@@ -28,6 +28,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "==> installing dependencies"
 export DEBIAN_FRONTEND=noninteractive
+apt-get update
 if ! dpkg -s glibc-repo >/dev/null 2>&1; then
 	apt-get install -y glibc-repo
 	apt-get update

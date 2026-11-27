@@ -45,11 +45,11 @@ function attr(s,n){ if (match(s, n "=\"[^\"]*\"")) return substr(s,RSTART+length
 操作命令：
 
 ```sh
-adb shell input tap X Y            # 点击（坐标取自 look.sh）
+adb shell input tap X Y            # 点击（屏幕像素坐标）
 termux-clipboard-set "hello"; adb shell input keyevent 279   # 用粘贴来输入文字（见下文）
 adb shell input swipe X1 Y1 X2 Y2 300
 adb shell input keyevent BACK
-adb shell am start -n <包名>/<Activity>   # 不要用 monkey 启动 App（见下文）
+adb shell am start -n <包名>/<Activity>
 ```
 
 ## 给 agent 的说明文件
@@ -58,12 +58,12 @@ agent 需要知道怎么操作手机、该在哪里停下。[phone/AGENTS.zh-CN.
 
 ## act.sh：操作后等屏幕稳定
 
-[phone/act.sh](../phone/act.sh) 执行一个或多个操作，屏幕一停止变化就返回，并附上最新截图。它用来替代固定的 `sleep`：固定等待要么太短（点击丢失），要么太长。
+[phone/act.sh](../phone/act.sh)（[配置](setup.zh-CN.md)时已经复制到说明文件旁边）执行一个或多个操作，屏幕一停止变化就返回，并附上最新截图。它用来替代固定的 `sleep`：固定等待要么太短（点击丢失），要么太长。
 
 ```sh
-phone/act.sh tap 540 1200                       # 点击，等屏幕稳定，截图
-phone/act.sh tap 540 300 paste "milk tea" key 66
-phone/act.sh -u swipe 540 1800 540 600          # -u 同时打印界面元素列表
+./act.sh tap 540 1200                       # 点击，等屏幕稳定，截图
+./act.sh tap 540 300 paste "milk tea" key 66
+./act.sh -u swipe 540 1800 540 600          # -u 同时打印界面元素列表
 ```
 
 在设置 App 里走同样的四步，它用了 28.8 秒，分开执行点击、sleep、截图要 47.8 秒。
@@ -99,7 +99,7 @@ adb shell dumpsys activity service SystemUIService WMShell splitscreen moveToSid
 adb shell dumpsys activity service SystemUIService WMShell splitscreen exitSplitScreen <taskId>   # 退出分屏
 ```
 
-在 Pixel 10 Pro Fold 的内屏上，分屏后 Termux 占 x 0–1026，App 占 x 1050–2076。`uiautomator` 给的仍然是整个屏幕的坐标，所以 `look.sh` 和 `input tap` 都不用改。
+在 Pixel 10 Pro Fold 的内屏上，分屏后 Termux 占 x 0–1026，App 占 x 1050–2076。`uiautomator` 给的仍然是整个屏幕的坐标，所以 `look.sh` 和 `input tap` 都不用改。用 `act.sh` 时可以设 `REGION="1050 2076"`（App 所占的列），这样另一半 Termux 里转动的进度提示就不会被当成“屏幕还在变”。
 
 - **主要适合折叠屏和平板。** 普通手机的半个屏幕太窄，多数 App 会挤得没法用。普通手机上还是让 App 占满全屏，用完再切回 Termux。
 - **当心键盘。** Termux 有焦点时，它的软键盘会挡住**左右两边**的下半部分，而 App 的「继续」「检查」这类按钮常常就在那里。点屏幕下方之前先看一眼截图，或者先把键盘收起来。
@@ -107,11 +107,10 @@ adb shell dumpsys activity service SystemUIService WMShell splitscreen exitSplit
 ## 踩过的坑
 
 - **点击之间要停一下。** 很多 App 每次点击后会播动画，动画期间收到的点击会被丢掉。配对题里间隔 0.6 秒的点击丢了一部分，间隔 1.3 秒就都正常。点完一串之后，再跑一次 `look.sh` 确认状态，不要想当然。
-- **没看过的页面别闭着眼睛连点。** 课程结束后，我用一个循环一直点屏幕底部正中的按钮，结果连续点过了好几页奖励和推销页面（送宝石、免费试用、「邀请好友加入家庭方案」），事后已经说不清每一下选了什么。非例行的页面要逐页读清楚，按按钮的文字去点。
+- **没看过的页面别闭着眼睛连点。** 课程结束后，agent 用一个循环一直点屏幕底部正中的按钮，结果连续点过了好几页奖励和推销页面（送宝石、免费试用、「邀请好友加入家庭方案」），事后已经说不清每一下选了什么。非例行的页面要逐页读清楚，按按钮的文字去点。
 - **`uiautomator dump` 不是什么都能看到。** 画在 canvas 或游戏视图里的内容只会显示成一个大节点，这种情况要看截图。
-- **坐标是屏幕像素。** `uiautomator` 给的 bounds 和 `input tap` 用的是同一套坐标，但缩小后的截图预览不是，所以坐标要取自 dump。
+- **坐标是屏幕像素。** `uiautomator` 给的 bounds 和 `input tap` 用的是同一套坐标，但缩小后的截图预览不是。从截图上估位置时，要先换算回原始分辨率的像素再点；需要精确坐标时，再从 dump 里取。
 - **不分屏的话，App 会占住整个屏幕。** Claude 操作期间你不能用手机，中途切走会让 Claude 点到别的 App 上。结束后用 `adb shell am start -n com.termux/.app.TermuxActivity` 切回 Termux。折叠屏和平板请用上面的分屏。
-- **不要用 `monkey` 打开 App。** `adb shell monkey -p <包名> ...` 拿来启动 App 很方便，但它退出时会打开自动旋转（折叠屏上连当前折叠状态的那一项也会改）。用户的屏幕方向锁定反复被解开，直到所有启动都改成 `am start -n <包名>/<Activity>` 才好。
 - **输入文字用粘贴。** `input text` 会经过输入法。自动纠错把 “Tang Shui” 改成了 “Tango Shui”；在中文输入状态下，文字进了候选栏而不是输入框。先设置剪贴板再发 `keyevent 279`（粘贴）可以避开这两个问题。
 - **想快就用截图，少用 `uiautomator dump`。** 屏幕上有动画时，一次 dump 要 10 秒以上。有一次为了读一个很长的菜单，逐页 dump 花了三分多钟；改用截图加 App 自带的搜索后，同样的任务只用了一分半。
 - **有些 App 禁止截屏**（`FLAG_SECURE`，银行、支付类常见），截出来是黑的，但 `uiautomator` 可能仍然读得到元素。

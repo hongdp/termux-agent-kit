@@ -10,7 +10,7 @@
 
 ## 0. 前提
 
-- Termux（aarch64），已经按 [claude-code.zh-CN.md](claude-code.zh-CN.md) 装好 `claude`。
+- Termux（aarch64），并且已经装好一个 agent。本文的例子用的是 Claude Code（见 [claude-code.zh-CN.md](claude-code.zh-CN.md)）；其他能执行 shell 命令的 agent 用法相同。
 - 至少 3 GB 空闲存储：Android SDK 约 1 GB，Gradle 缓存和依赖约 1–2 GB。
 - 内存：Gradle 默认 `-Xmx4g`。编译前最好关掉后台 App，否则可能被系统杀掉。
 - 项目里不能有原生代码（NDK / CMake / Rust）。原生部分本文没有覆盖，见文末。
@@ -109,26 +109,11 @@ allprojects {
 
 打开 Android 的「无线调试」后，Termux 里的 `adb` 可以连到手机本身。连上以后就能装 App、截屏、看日志、模拟点击，Claude Code 可以自己完成「改代码 → 编译 → 安装 → 看效果」整个循环。
 
-### 配对（只需一次）
+### 配对和连接
 
-1. 开发者选项 → 打开「无线调试」（要连着 Wi-Fi）→ 点「使用配对码配对设备」。
-2. 弹窗显示 6 位配对码和端口，窗口一关配对码就失效。折叠屏或平板可以**分屏**，一边开设置，一边开 Termux：
+配对（只需一次）和连接的步骤见 [setup.zh-CN.md](setup.zh-CN.md) 第 4 节。重启手机、换 Wi-Fi，或者关掉再打开无线调试后，连接端口都会变，要重新 `adb connect`；配对不用重做。
 
-```sh
-adb pair 127.0.0.1:<配对端口> <6位配对码>
-```
-
-### 连接
-
-「无线调试」主页面上显示的「IP 地址和端口」是**连接端口**，和配对端口不是同一个：
-
-```sh
-adb connect 127.0.0.1:<连接端口>
-adb devices -l
-```
-
-- 重启手机、换 Wi-Fi，或者关掉再打开无线调试后，连接端口都会变，要重新 `adb connect`。配对不用重做。
-- Termux 的 `adb` 不支持 mDNS（`adb mdns` 会提示 not supported），所以端口没法自动发现，只能看屏幕。在本机逐个扫描 30000–49999 端口太慢，不推荐。
+Termux 的 `adb` 不支持 mDNS（`adb mdns` 会提示 not supported），所以端口没法自动发现，只能看屏幕。在本机逐个扫描 30000–49999 端口太慢，不推荐。
 
 ### 常用操作
 
@@ -163,7 +148,7 @@ Pixel 10 Pro Fold 的两块屏幕分别是 2076×2152（内屏）和 1080×2364�
 adb shell am start -W -n <pkg>/<activity>
 sleep 3
 adb exec-out screencap -d <display-id> -p > shot.png
-adb shell am start -n com.termux/.app.TermuxActivity   # 切回 Termux（不要用 monkey，它会打开自动旋转）
+adb shell am start -n com.termux/.app.TermuxActivity   # 切回 Termux
 ```
 
 App 切到前台时会占用你的屏幕，所以让 Claude 先打招呼再测。

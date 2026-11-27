@@ -10,7 +10,7 @@ No root and no computer needed.
 
 ## 0. Prerequisites
 
-- Termux (aarch64) with `claude` installed as described in [claude-code.md](claude-code.md).
+- Termux (aarch64) with an agent installed. The examples use Claude Code ([claude-code.md](claude-code.md)); any agent that can run shell commands works the same way.
 - At least 3 GB of free storage: about 1 GB for the Android SDK and 1–2 GB for Gradle caches and dependencies.
 - Memory: Gradle defaults to `-Xmx4g`. Close background apps before building, or the system may kill the build.
 - The project must not contain native code (NDK / CMake / Rust). Native code is not covered here; see the end of this guide.
@@ -109,26 +109,11 @@ With Conscrypt off, code that relies directly on Conscrypt's crypto implementati
 
 Once Android's Wireless debugging is on, `adb` in Termux can connect to the phone itself. That lets you install apps, take screenshots, read logs and simulate taps, so Claude Code can run the whole "edit → build → install → check the result" loop by itself.
 
-### Pairing (once)
+### Pairing and connecting
 
-1. Developer options → turn on Wireless debugging (requires Wi-Fi) → tap "Pair device with pairing code".
-2. A dialog shows a 6-digit pairing code and a port. The code becomes invalid as soon as the dialog closes. On a foldable or tablet, use **split screen**, with Settings on one side and Termux on the other:
+Pair once and connect as described in [setup.md](setup.md#4-connect-adb-to-the-phone-itself). The connect port changes after a reboot, a Wi-Fi change, or toggling Wireless debugging, so run `adb connect` again; pairing is kept.
 
-```sh
-adb pair 127.0.0.1:<pairing-port> <6-digit-code>
-```
-
-### Connecting
-
-The "IP address & Port" shown on the main Wireless debugging page is the **connect port**, which is different from the pairing port:
-
-```sh
-adb connect 127.0.0.1:<connect-port>
-adb devices -l
-```
-
-- The connect port changes after a reboot, a Wi-Fi change, or toggling Wireless debugging off and on, so run `adb connect` again. Pairing doesn't need to be redone.
-- Termux's `adb` doesn't support mDNS (`adb mdns` reports not supported), so the port can't be discovered automatically; read it off the screen. Scanning local ports 30000–49999 one by one is too slow to be practical.
+Termux's `adb` doesn't support mDNS (`adb mdns` reports not supported), so the port can't be discovered automatically; read it off the screen. Scanning local ports 30000–49999 one by one is too slow to be practical.
 
 ### Common operations
 
@@ -163,7 +148,7 @@ The app under test and Termux share one screen. While Claude runs in Termux, the
 adb shell am start -W -n <pkg>/<activity>
 sleep 3
 adb exec-out screencap -d <display-id> -p > shot.png
-adb shell am start -n com.termux/.app.TermuxActivity   # back to Termux (not monkey: it turns auto-rotate on)
+adb shell am start -n com.termux/.app.TermuxActivity   # back to Termux
 ```
 
 Bringing the app to the front takes over your screen, so have Claude announce it before testing.

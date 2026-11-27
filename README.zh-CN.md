@@ -65,19 +65,25 @@ Termux 很多年前就能做这类事，但在手机上敲命令行实在太难�
 下面是精简版。[docs/setup.zh-CN.md](docs/setup.zh-CN.md) 里有完整步骤，每一步后面都有检查。
 
 ```sh
-# 1. 安装依赖
+# 1. 安装依赖（先整体升级，让所有包的版本互相匹配）
+apt-get update && apt-get full-upgrade -y
 pkg install -y git android-tools termux-api tmux
 
 # 2. 安装一个 agent（这里是 Claude Code；Antigravity CLI 见 docs/antigravity.zh-CN.md）
 git clone https://github.com/hongdp/claude-termux.git
 cd claude-termux && bash install.sh
 
-# 3. 把 adb 连到手机自己：在开发者选项里打开无线调试，然后
+# 3. 把 adb 连到手机自己：在开发者选项里打开无线调试。
+#    输入配对码时用分屏让配对弹窗一直开着；
+#    连接端口是另一个，显示在无线调试页面上。
 adb pair 127.0.0.1:<配对端口> <配对码>
 adb connect 127.0.0.1:<连接端口>
 
 # 4. 给 agent 准备一个带说明文件的目录
-mkdir -p ~/projects/phone && cp phone/AGENTS.zh-CN.md ~/projects/phone/CLAUDE.md
+mkdir -p ~/projects/phone
+cp phone/AGENTS.zh-CN.md ~/projects/phone/AGENTS.md
+cp phone/act.sh ~/projects/phone/
+ln -s AGENTS.md ~/projects/phone/CLAUDE.md
 
 # 5. 开始
 cd ~/projects/phone && claude
@@ -121,7 +127,6 @@ agent 用的是你的账号，操作的是你的手机。
 
 | 现象 | 怎么办 |
 | --- | --- |
-| 屏幕方向锁定总是自己被解开 | 不要用 `adb shell monkey` 启动 App，改用 `am start -n <包名>/<Activity>` |
 | 输入的文字不对或者没输进去 | 不用 `input text`，改用粘贴：`termux-clipboard-set "文字"; adb shell input keyevent 279` |
 | `claude remote-control` 提示 “Workspace not trusted” | 在项目目录里启动，不要在主目录；并先在该目录运行一次 `claude` |
 | Claude Code 里 `grep` / `find` 报 `invalid ELF header` | 用 `command grep` 和 `command find` |

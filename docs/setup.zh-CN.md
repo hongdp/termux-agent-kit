@@ -30,13 +30,19 @@ pkg install -y git android-tools termux-api tmux
 
 **检查：** `termux-clipboard-set hello && termux-clipboard-get` 输出 `hello`。如果卡住不动，说明 Termux:API App 没装，或者和 Termux 不是同一个来源。
 
-## 3. 安装一个 agent
+## 3. 克隆本仓库，安装一个 agent
+
+两个 agent 都要用到本仓库里的文件（说明模板和 `act.sh`），所以先把仓库克隆下来：
+
+```sh
+git clone https://github.com/hongdp/claude-termux.git
+cd claude-termux
+```
 
 **Claude Code：**
 
 ```sh
-git clone https://github.com/hongdp/claude-termux.git
-cd claude-termux && bash install.sh
+bash install.sh            # 在 claude-termux 目录里执行
 claude                     # 第一次运行时执行 /login
 ```
 
@@ -77,13 +83,14 @@ adb exec-out screencap -p > $TMPDIR/s.png; head -c 60 $TMPDIR/s.png
 在单独的项目目录里启动 agent，不要在主目录里启动。
 
 ```sh
-mkdir -p ~/projects/phone ~/bin
-cp phone/AGENTS.zh-CN.md ~/projects/phone/AGENTS.md      # 在 claude-termux 目录里执行
-cp phone/AGENTS.zh-CN.md ~/projects/phone/CLAUDE.md      # Claude Code 读的是 CLAUDE.md
-cp phone/act.sh ~/bin/act.sh
+# 在 claude-termux 目录里执行
+mkdir -p ~/projects/phone
+cp phone/AGENTS.zh-CN.md ~/projects/phone/AGENTS.md
+cp phone/act.sh ~/projects/phone/
+ln -s AGENTS.md ~/projects/phone/CLAUDE.md      # Claude Code 读的是 CLAUDE.md；这样只需要改一份
 ```
 
-编辑文件末尾“这台手机”一节：有屏幕 ID 的话填上，再写上你打算用的 App。
+编辑 `~/projects/phone/AGENTS.md` 末尾“这台手机”一节：有屏幕 ID 的话填上，再写上你打算用的 App。
 
 ## 6. 第一次运行
 
@@ -121,14 +128,13 @@ cd ~/projects/phone && claude remote-control --name phone
 
 | 现象 | 原因 | 怎么办 |
 | --- | --- | --- |
-| 屏幕方向锁定总是自己被解开 | `adb shell monkey` 退出时会打开自动旋转 | 用 `adb shell am start -n <包名>/<Activity>` 启动 App |
 | 输入的文字不对，或者没进输入框 | `input text` 会经过输入法：自动纠错会改字，中文输入状态会把字吞掉 | 改用粘贴：`termux-clipboard-set "文字"; adb shell input keyevent 279` |
 | agent 的会话自己停了 | 按键事件落到了 agent 自己的客户端上；`keyevent 111`（Esc）会按到它的停止按钮 | 绝不发送 `keyevent 111` |
 | `claude remote-control` 提示 “Workspace not trusted” | 在主目录里启动；主目录的信任状态不会被保存 | 换成项目目录，并先在里面运行一次 `claude` |
 | Claude Code 的 Bash 工具里 `grep`、`find` 报 `invalid ELF header` | 内置的替代品会带着 Termux 的 `LD_PRELOAD` 重新执行 glibc 二进制 | 用 `command grep` 和 `command find` |
 | agent 读一个长列表要好几分钟 | 屏幕有动画时 `uiautomator dump` 一次要 10 秒以上 | 让它用截图和 App 自带的搜索（模板里已经写了） |
-| 点击好像没反应 | App 还在播动画 | 用 `act.sh`，或者两次点击之间等一秒左右 |
+| 点击好像没反应 | App 还在播动画 | 用 `./act.sh`，或者两次点击之间等一秒左右 |
 | 截图文件里是 `Multiple displays were found` | 有不止一块屏幕 | 加 `-d <屏幕ID>` |
 | 重启后 `adb devices` 是空的 | 连接端口变了 | `adb connect 127.0.0.1:<新端口>` |
-| `agy` 每条命令都要确认 | Android 上没有沙箱，不能用 auto 模式 | 见 [antigravity.zh-CN.md](antigravity.zh-CN.md) |
+| `agy` 每条命令都要确认 | Android 上没有沙箱，不能用 auto 模式 | 见 [antigravity.zh-CN.md](antigravity.zh-CN.md#android-上的权限) |
 | 装完包之后 `curl` 坏了 | 升级只做了一半，libcurl 和 openssl 版本不一致 | `apt-get full-upgrade` |

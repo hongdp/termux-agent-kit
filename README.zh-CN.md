@@ -30,6 +30,7 @@ Claude Code 和 Antigravity CLI，跑在 Termux 里。不用 root，不用 proot
 - [把手机交给 agent 之前](#把手机交给-agent-之前)
 - [常见问题](#常见问题)
 - [仓库结构](#仓库结构)
+- [相关项目](#相关项目)
 - [参与贡献](#参与贡献)
 - [许可证与声明](#许可证与声明)
 
@@ -80,7 +81,7 @@ Termux 很多年前就能做这类事，但在手机上敲命令行实在太难�
 ```sh
 # 1. 安装依赖（先整体升级，让所有包的版本互相匹配）
 apt-get update && apt-get full-upgrade -y
-pkg install -y git android-tools termux-api tmux
+pkg install -y git android-tools termux-api tmux nmap
 
 # 2. 安装一个 agent（这里是 Claude Code；Antigravity CLI 见 docs/antigravity.zh-CN.md）
 git clone https://github.com/hongdp/termux-agent-kit.git
@@ -95,7 +96,7 @@ adb connect 127.0.0.1:<连接端口>
 # 4. 给 agent 准备一个带说明文件的目录
 mkdir -p ~/projects/phone
 cp phone/AGENTS.zh-CN.md ~/projects/phone/AGENTS.md
-cp phone/act.sh ~/projects/phone/
+cp phone/act.sh phone/adb-connect.sh ~/projects/phone/
 ln -s AGENTS.md ~/projects/phone/CLAUDE.md
 
 # 5. 开始
@@ -143,7 +144,7 @@ agent 用的是你的账号，操作的是你的手机。
 | 输入的文字不对或者没输进去 | 不用 `input text`，改用粘贴：`termux-clipboard-set "文字"; adb shell input keyevent 279` |
 | `claude remote-control` 提示 “Workspace not trusted” | 在项目目录里启动，不要在主目录；并先在该目录运行一次 `claude` |
 | Claude Code 里 `grep` / `find` 报 `invalid ELF header` | 用 `command grep` 和 `command find` |
-| 重启后 `adb devices` 是空的 | 端口变了：`adb connect 127.0.0.1:<新端口>` |
+| 重启后 `adb devices` 是空的 | 端口变了：在 agent 的目录里运行 `./adb-connect.sh` |
 
 ## 仓库结构
 
@@ -154,9 +155,20 @@ claude-termux-update    更新、列出版本、回滚
 shim-bash               给 Claude Code 的 Bash 工具用的 shell 转接脚本
 phone/AGENTS.md         给任何 agent 用的说明模板（另有中文版）
 phone/act.sh            执行点击、滑动、粘贴，屏幕稳定后返回
+phone/adb-connect.sh    重新找到无线调试端口并连上 adb
 docs/                   各篇指南，均有英文和简体中文版
 docs/media/             本页用到的演示 GIF
 ```
+
+## 相关项目
+
+还有其他人在从不同角度做同一件事。如果本仓库不适合你的环境，可以看看这些：
+
+- [termux-coding-agents](https://github.com/bobbymac/termux-coding-agents)：用另一种技术在 Termux 里运行 Claude Code 等 agent，支持 Google Play 版 Termux，并保留了 Claude Code 自带的更新功能。本仓库的 `phone/adb-connect.sh` 参考了它 `adb-local` 里发现端口的做法。
+- [android-agent](https://github.com/nebigoktug/android-agent)：一个命令行工具加 MCP 服务，让 agent 使用安卓 App，可以在电脑上运行，也可以在手机的 Termux 里运行。
+- [droidrun](https://github.com/droidrun/droidrun) 和 [mobile-use](https://github.com/minitap-ai/mobile-use)：独立的手机 agent 框架。
+
+第一个项目我们读过代码，其余的没有用过；以上介绍来自它们各自的 README。
 
 ## 参与贡献
 

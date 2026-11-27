@@ -15,18 +15,19 @@ Tested on a Pixel 10 Pro Fold (Android 17, aarch64). Other phones should work; t
 
 ## 2. Termux and Termux:API
 
-Install both apps from the **same source**: the [Termux GitHub releases](https://github.com/termux/termux-app/releases) and [Termux:API releases](https://github.com/termux/termux-api/releases), or F-Droid for both. They are signed per source, and a mismatched pair won't talk to each other. This guide was tested with the GitHub builds.
+Install both apps from the **same source**: the [Termux GitHub releases](https://github.com/termux/termux-app/releases) and [Termux:API releases](https://github.com/termux/termux-api/releases), or F-Droid for both. They are signed per source, and a mismatched pair won't talk to each other. This guide was tested with the GitHub builds. The Google Play build of Termux restricts how programs are started, and the Claude Code installer here has not been tested on it; if you use that build, see [termux-coding-agents](https://github.com/bobbymac/termux-coding-agents), which is written for it.
 
 In Termux:
 
 ```sh
 apt-get update && apt-get full-upgrade -y     # bring all packages to matching versions
-pkg install -y git android-tools termux-api tmux
+pkg install -y git android-tools termux-api tmux nmap
 ```
 
 - `android-tools` provides `adb`.
 - `termux-api` provides `termux-clipboard-set`, which the agent uses to type text. It needs the Termux:API app.
 - `tmux` keeps an agent running while Termux is in the background.
+- `nmap` lets `adb-connect.sh` find the Wireless debugging port again after it changes.
 
 **Check:** `termux-clipboard-set hello && termux-clipboard-get` prints `hello`. If it hangs, the Termux:API app is missing or from a different source.
 
@@ -68,7 +69,7 @@ claude                     # run /login the first time
 
 **Check:** `adb devices` lists `127.0.0.1:<port>   device`.
 
-The connect port changes after a reboot, a Wi-Fi change, or turning Wireless debugging off and on. Run `adb connect` again with the new port; pairing is kept.
+The connect port changes after a reboot, a Wi-Fi change, or turning Wireless debugging off and on. Pairing is kept, so you only need the new port: run `phone/adb-connect.sh`, which finds it and reconnects (the first run takes up to half a minute, later runs a few seconds). The agent can run it too. You can also read the port off the Wireless debugging page and run `adb connect` yourself.
 
 ### Display id (foldables and other multi-display devices)
 
@@ -85,7 +86,7 @@ Start the agent in its own project folder, not in your home directory.
 ```sh
 # run from the termux-agent-kit folder
 mkdir -p ~/projects/phone
-cp phone/AGENTS.md phone/act.sh ~/projects/phone/
+cp phone/AGENTS.md phone/act.sh phone/adb-connect.sh ~/projects/phone/
 ln -s AGENTS.md ~/projects/phone/CLAUDE.md      # Claude Code reads CLAUDE.md; one file to edit
 ```
 
@@ -134,6 +135,6 @@ The agent can't act while the screen is locked, and Android may stop Termux in t
 | The agent takes minutes on a long list | `uiautomator dump` takes 10 s or more while the screen animates | Tell it to use screenshots and the app's own search (the template does) |
 | Taps seem to be ignored | The app was still animating | Use `./act.sh`, or wait about a second between taps |
 | Screenshot file contains `Multiple displays were found` | More than one display | Add `-d <display id>` |
-| `adb devices` is empty after a reboot | The connect port changed | `adb connect 127.0.0.1:<new port>` |
+| `adb devices` is empty after a reboot | The connect port changed | Run `./adb-connect.sh` in the agent's folder |
 | `agy` asks before every command | No sandbox on Android, so auto mode is unavailable | See [antigravity.md](antigravity.md#permissions-on-android) |
 | `curl` breaks after installing packages | A partial upgrade left libcurl and openssl out of sync | `apt-get full-upgrade` |

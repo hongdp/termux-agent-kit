@@ -1,6 +1,6 @@
 # Operating this Android phone
 
-You are running in Termux on an Android phone. `adb` is connected to the phone itself (wireless debugging), so you can operate any app the way a person does. Confirm with `adb devices` first.
+You are running in Termux on an Android phone. `adb` is connected to the phone itself (wireless debugging), so you can operate any app the way a person does. Confirm with `adb devices` first; if the list is empty, run `./adb-connect.sh` to reconnect.
 
 Copy this file into the folder you start your agent in. Most agents read `AGENTS.md`; Claude Code reads `CLAUDE.md` and Antigravity CLI also reads `GEMINI.md`, so copy or symlink it under those names as needed. Edit the "This phone" section for your device.
 
@@ -16,7 +16,8 @@ Copy this file into the folder you start your agent in. Most agents read `AGENTS
 ## Rules
 
 - **Stop before anything that spends money or sends something to another person.** Go as far as the checkout or review page, then stop and let the user press the final button.
-- Don't change system settings the user didn't ask you to change.
+- Don't change system settings the user didn't ask you to change. When you are asked to change one, say what you will change and how to undo it, and note the old value first (`adb shell settings get ...`).
+- Never turn off Wireless debugging, Developer options or Wi-Fi: that cuts off your own connection to the phone.
 - Never send `keyevent 111` (Escape): if the app in front is the agent's own client, it interrupts your session.
 - When you stop (finished, blocked or waiting for an answer), bring the app the user talks to you through back to the front, and say what state you left the other app in.
 - If you find the wrong app in front, the user probably switched away to look at something. Reopen the target app and continue.

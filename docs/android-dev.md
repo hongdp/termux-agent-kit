@@ -113,7 +113,7 @@ Once Android's Wireless debugging is on, `adb` in Termux can connect to the phon
 
 Pair once and connect as described in [setup.md](setup.md#4-connect-adb-to-the-phone-itself). The connect port changes after a reboot, a Wi-Fi change, or toggling Wireless debugging, so run `adb connect` again; pairing is kept.
 
-Termux's `adb` doesn't support mDNS (`adb mdns` reports not supported), so the port can't be discovered automatically; read it off the screen. Scanning local ports 30000–49999 one by one is too slow to be practical.
+Termux's `adb` doesn't support mDNS (`adb mdns` reports not supported), so the port can't be discovered that way. [phone/adb-connect.sh](../phone/adb-connect.sh) finds it by scanning the local port range with `nmap`, which takes a few seconds.
 
 ### Common operations
 

@@ -113,7 +113,7 @@ allprojects {
 
 配对（只需一次）和连接的步骤见 [setup.zh-CN.md](setup.zh-CN.md) 第 4 节。重启手机、换 Wi-Fi，或者关掉再打开无线调试后，连接端口都会变，要重新 `adb connect`；配对不用重做。
 
-Termux 的 `adb` 不支持 mDNS（`adb mdns` 会提示 not supported），所以端口没法自动发现，只能看屏幕。在本机逐个扫描 30000–49999 端口太慢，不推荐。
+Termux 的 `adb` 不支持 mDNS（`adb mdns` 会提示 not supported），所以不能靠它发现端口。[phone/adb-connect.sh](../phone/adb-connect.sh) 用 `nmap` 扫本机端口范围来找，只要几秒。
 
 ### 常用操作
 

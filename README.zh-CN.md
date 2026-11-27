@@ -66,6 +66,10 @@ claude update                     # 等同于 claude-termux-update
 
 用 Termux + Gradle + 本机 adb（无线调试），可以在手机上编译、安装、调试 Android 应用，Claude Code 能自己完成「改代码 → 编译 → 安装 → 截屏验证」整个循环。完整攻略见 [docs/android-dev.zh-CN.md](docs/android-dev.zh-CN.md)。
 
+### 让 Claude 操作手机上的 App
+
+同一条本机 adb 连接，还能让 Claude 像人一样操作任何 App：用截屏和界面元素列表看屏幕，再点击、滑动、打字。实测它打开一个语言学习 App，自己完整做完了一节课。原理和踩过的坑见 [docs/phone-automation.zh-CN.md](docs/phone-automation.zh-CN.md)。请遵守各个 App 的用户协议。
+
 ## 文件
 
 | 文件 | 作用 |

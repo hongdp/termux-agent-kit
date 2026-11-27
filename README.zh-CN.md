@@ -62,7 +62,7 @@ claude update                     # 等同于 claude-termux-update
 
 ## 在手机上开发 Android 应用
 
-用 Termux + Gradle + 本机 adb（无线调试），可以在手机上编译、安装、调试 Android 应用，Claude Code 能自己完成「改代码 → 编译 → 安装 → 截屏验证」整个循环。完整攻略见 [docs/android-dev.md](docs/android-dev.md)。
+用 Termux + Gradle + 本机 adb（无线调试），可以在手机上编译、安装、调试 Android 应用，Claude Code 能自己完成「改代码 → 编译 → 安装 → 截屏验证」整个循环。完整攻略见 [docs/android-dev.zh-CN.md](docs/android-dev.zh-CN.md)。
 
 ## 文件
 

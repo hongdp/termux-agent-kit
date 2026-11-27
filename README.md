@@ -62,7 +62,7 @@ Tested 2.1.332 and 2.1.326 on a Pixel 10 Pro Fold (Android 17, kernel 6.12, Term
 
 ## Developing Android apps on the phone
 
-With Termux + Gradle + adb to the phone itself (wireless debugging), you can build, install and debug Android apps on the phone, and Claude Code can run the whole "edit → build → install → screenshot to verify" loop by itself. Full guide (in Chinese): [docs/android-dev.md](docs/android-dev.md).
+With Termux + Gradle + adb to the phone itself (wireless debugging), you can build, install and debug Android apps on the phone, and Claude Code can run the whole "edit → build → install → screenshot to verify" loop by itself. Full guide: [docs/android-dev.md](docs/android-dev.md).
 
 ## Files
 

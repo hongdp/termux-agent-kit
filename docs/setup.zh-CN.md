@@ -117,17 +117,6 @@ cd ~/projects/phone && claude remote-control --name phone
 - 任务期间在 设置 → 显示 里把熄屏时间调长。
 - 在 设置 → 应用 → Termux → 应用电池用量 里选 **无限制**。
 
-## 9. 录演示视频（可选）
-
-```sh
-adb shell screenrecord --time-limit 0 /sdcard/Movies/demo.mp4     # Ctrl+C 停止
-```
-
-- 折叠屏在折叠状态下不要加 `--display-id`：传内屏的 ID 会报 `UNASSIGNED_LAYER_STACK`。
-- 干净的状态栏：`adb shell settings put global sysui_demo_allowed 1`，然后 `adb shell am broadcast -a com.android.systemui.demo -e command enter`。退出用 `-e command exit`。
-- 显示触点：`adb shell settings put system show_touches 1`（录完改回 `0`）。
-- **分享前先打码。** 录屏会把你的地址、名字、搜索历史、账号头像和其他会话都录进去。切换 App 的动画里画面会滑动，在静止画面上盖住某个字段的遮罩，可能有几帧盖不住；转场要逐帧检查。
-
 ## 踩坑对照表
 
 | 现象 | 原因 | 怎么办 |

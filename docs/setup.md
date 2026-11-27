@@ -117,17 +117,6 @@ The agent can't act while the screen is locked, and Android may stop Termux in t
 - Raise the screen timeout in Settings → Display for the duration of the task.
 - In Settings → Apps → Termux → App battery usage, choose **Unrestricted**.
 
-## 9. Record a demo (optional)
-
-```sh
-adb shell screenrecord --time-limit 0 /sdcard/Movies/demo.mp4     # Ctrl+C to stop
-```
-
-- On a folded foldable, leave out `--display-id`: passing the inner display's id fails with `UNASSIGNED_LAYER_STACK`.
-- A clean status bar: `adb shell settings put global sysui_demo_allowed 1`, then `adb shell am broadcast -a com.android.systemui.demo -e command enter`. Leave with `-e command exit`.
-- Show taps: `adb shell settings put system show_touches 1` (set back to `0` afterwards).
-- **Blur before you share.** Recordings of real apps show your address, name, search history, account avatar and other sessions. Screens also slide during app-switch animations, so a mask that covers a field on a still frame can miss it for a few frames; check the transitions frame by frame.
-
 ## Pitfalls
 
 | What you see | Cause | What to do |

@@ -60,7 +60,9 @@ claude update                     # 等同于 claude-termux-update
 
 - Claude Code 会在 Bash 工具里把 `grep`、`find` 替换成内置的 ugrep、bfs，实际是用 argv0 重新执行 claude 本体。因为 `shim-bash` 恢复了 bionic 的 `LD_PRELOAD`，glibc 版 claude 一启动就报 `error while loading shared libraries: .../glibc/lib/libc.so: invalid ELF header`。临时办法是改用 `command grep`、`command find`；你在 Termux 里自己用的 `grep` 不受影响。环境变量 `EMBEDDED_SEARCH_TOOLS=0` 实测无效。要根治，需要在启动内置工具时去掉 `LD_PRELOAD`。
 
-## 在手机上开发 Android 应用
+## 用 Termux 上的 Claude 能玩什么
+
+### 在手机上直接开发 Android 应用
 
 用 Termux + Gradle + 本机 adb（无线调试），可以在手机上编译、安装、调试 Android 应用，Claude Code 能自己完成「改代码 → 编译 → 安装 → 截屏验证」整个循环。完整攻略见 [docs/android-dev.zh-CN.md](docs/android-dev.zh-CN.md)。
 

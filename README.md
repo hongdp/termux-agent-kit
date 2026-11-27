@@ -2,13 +2,48 @@
 
 English | [简体中文](README.zh-CN.md)
 
-Run AI coding agents **natively** in Termux on Android and let them operate the phone: open apps, read the screen, tap and type, with you sending prompts from the agent's own app or web page on the same phone. No root, no proot, no accessibility service.
+**Run AI coding agents natively on your Android phone, and let them use the phone.**
 
-The repo started as a way to run Claude Code in Termux (hence the name) and now covers three things:
+Claude Code and Antigravity CLI, running in Termux. No root, no proot, no VM.
 
-1. **Getting agents to run in Termux.** Claude Code needs the glibc wrapper in this repo; Antigravity CLI has a native Android build.
-2. **A kit for operating the phone**, which works with any agent that can run shell commands and read images: an instruction file for the agent, a helper script, and a guide with the lessons learned.
-3. **Building Android apps on the phone itself.**
+## Why
+
+I used to run my agents on a PC and a Linux workstation and connect to them from my phone. Then one day, while I was away, the workstation went offline because of a loose network cable, and I started to wonder: do I really need a beefy machine just to run agents? Why can't they run on the phone directly?
+
+Termux has been able to do this kind of thing for years, but working in a CLI on a phone is painful. With an agent, that stops being a problem: the agent does the typing.
+
+## What you can do
+
+- **Run the agents on the phone.** Claude Code runs through the glibc wrapper in this repo. Antigravity CLI has a native Android build.
+- **Talk to them from their own apps.** Start the agent in Termux with remote control on, then send prompts from the Claude app or the Antigravity web page on the same phone.
+- **Build Android apps on the phone itself.** The agent edits the code, builds with Gradle, installs over a local adb connection and takes a screenshot to check its work.
+- **Let the agent operate the phone.** With the same adb connection it can open any app, read the screen, tap and type. It can finish a language lesson when you're too busy to keep your streak, or get a food order ready and stop at checkout so you press the final button yourself.
+
+One prompt both agents handled from start to finish, sent from their client on the phone:
+
+> Open DoorDash, order a milk tea from the nearest Tong Sui, you pick the drink, stop at the checkout page.
+
+Each one found the store, picked a drink, set the options, reached the checkout page, stopped there and switched back to its client.
+
+## Quick start
+
+**1. Install an agent** (Termux on aarch64):
+
+```sh
+# Claude Code
+pkg install -y git
+git clone https://github.com/hongdp/claude-termux.git
+cd claude-termux && bash install.sh
+claude                     # run /login the first time
+```
+
+For Antigravity CLI, follow [docs/antigravity.md](docs/antigravity.md); it takes one install script and a browser sign-in.
+
+**2. Connect adb to the phone itself.** Turn on Wireless debugging, then pair and connect to `127.0.0.1`. The steps are in [docs/android-dev.md](docs/android-dev.md#5-local-adb-the-phone-connects-to-itself).
+
+**3. Give the agent its instructions.** Copy [phone/AGENTS.md](phone/AGENTS.md) into the folder you start the agent in (as `CLAUDE.md` for Claude Code) and fill in the section about your phone.
+
+**4. Ask for something.** Start small, for example "open Settings and tell me the Android version", and watch what it does.
 
 ## Agents
 
@@ -17,29 +52,32 @@ The repo started as a way to run Claude Code in Termux (hence the name) and now 
 | Claude Code | Official `linux-arm64` binary, patched to use Termux's glibc by `install.sh` in this repo | Claude app | [below](#claude-code-in-termux) |
 | Antigravity CLI (`agy`, Gemini) | Official native Android binary | Web page in a browser | [docs/antigravity.md](docs/antigravity.md) |
 
-Other agents have not been tested here. If one runs in Termux, can run `adb` and can look at a PNG, the phone kit below should work with it.
+Other agents have not been tested here. If one runs in Termux, can run `adb` and can look at a PNG, the phone kit should work with it.
 
-## Operate the phone
+## Guides and tools
 
-Connect `adb` in Termux to the phone itself through Wireless debugging, drop [phone/AGENTS.md](phone/AGENTS.md) into the agent's folder, and ask for something:
+| | |
+| --- | --- |
+| [docs/phone-automation.md](docs/phone-automation.md) | Operating apps: setup, the look-decide-act loop, remote control, split screen on foldables, test results, and what went wrong along the way |
+| [docs/android-dev.md](docs/android-dev.md) | Building, installing and debugging Android apps on the phone |
+| [docs/antigravity.md](docs/antigravity.md) | Antigravity CLI in Termux: install, permissions, memory, remote control |
+| [phone/AGENTS.md](phone/AGENTS.md) | Instruction template for the agent ([中文](phone/AGENTS.zh-CN.md)) |
+| [phone/act.sh](phone/act.sh) | Runs taps, swipes and pastes, then returns as soon as the screen settles |
 
-> Open DoorDash, order a milk tea from the nearest Tong Sui, you pick the drink, stop at the checkout page.
+## Before you hand over your phone
 
-Both tested agents did this from a prompt sent on the phone, stopped at checkout and switched back to their client. Claude Code with Sonnet 5.5 took about a minute and a half; Antigravity CLI with Gemini 4 Hydrogen took about five minutes, in one run each under slightly different conditions.
+The agent acts with your accounts, on your phone.
 
-- [docs/phone-automation.md](docs/phone-automation.md): setup, the look-decide-act loop, remote control, split screen on foldables, and what went wrong along the way.
-- [phone/AGENTS.md](phone/AGENTS.md): instruction template for the agent ([中文](phone/AGENTS.zh-CN.md)).
-- [phone/act.sh](phone/act.sh): runs taps, swipes and pastes, then returns as soon as the screen settles.
-
-The agent acts with your accounts on your phone. The template tells it to stop before anything that spends money or sends something to another person; keep that rule, watch what it does, and respect each app's terms of service.
-
-## Build Android apps on the phone
-
-With Termux, Gradle and the same local adb connection, an agent can run the whole "edit → build → install → screenshot to verify" loop on the phone. Full guide: [docs/android-dev.md](docs/android-dev.md).
+- The instruction template tells it to stop before anything that spends money or sends something to another person. Keep that rule.
+- Watch it work, at least until you trust a task. On a foldable or tablet, split screen keeps the terminal visible next to the app.
+- Many apps forbid automated use in their terms of service. Use this for your own experiments, testing and accessibility needs.
+- Tested on one device, a Pixel 10 Pro Fold on Android 17. Other phones may need small changes, such as display ids.
 
 ## Claude Code in Termux
 
-### Why
+The rest of this page explains how Claude Code is made to run in Termux, and how to update or remove it.
+
+### Why a wrapper is needed
 
 - The npm package `@anthropic-ai/claude-code` is only an installer; the real program is a prebuilt binary downloaded per platform. The installer knows a `linux-arm64-android` platform, but no such package is published on npm (as of 2.1.332).
 - Termux uses Android's bionic libc, while the official `linux-arm64` binary expects glibc (`/lib/ld-linux-aarch64.so.1`), so it fails to start as-is.

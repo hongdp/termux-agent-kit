@@ -2,13 +2,48 @@
 
 [English](README.md) | 简体中文
 
-在 Android 的 Termux 里**原生**运行各家 AI 编程 agent，并让它们操作这台手机：打开 App、看屏幕、点击、打字；你可以在同一台手机上用 agent 自己的 App 或网页给它发指令。不用 root，不用 proot，不用无障碍服务。
+**在安卓手机上原生运行 AI 编程 agent，并让它们操作这台手机。**
 
-这个仓库最初是为了在 Termux 里跑 Claude Code（名字由此而来），现在包含三部分：
+Claude Code 和 Antigravity CLI，跑在 Termux 里。不用 root，不用 proot，不用虚拟机。
 
-1. **让 agent 在 Termux 里跑起来。** Claude Code 需要本仓库的 glibc 包装；Antigravity CLI 有原生 Android 版本。
-2. **一套操作手机的工具**，任何能执行 shell 命令、能读图片的 agent 都能用：给 agent 的说明文件、一个辅助脚本，以及一份写了踩坑经验的指南。
-3. **在手机上直接开发 Android 应用。**
+## 起因
+
+我以前把 agent 跑在 PC 和一台 Linux 工作站上，再从手机远程连过去。有一天我不在家，工作站因为网线松了突然掉线，我开始想：跑 agent 真的需要这么强的机器吗？为什么不能直接跑在手机上？
+
+Termux 很多年前就能做这类事，但在手机上敲命令行实在太难受。有了 agent，这就不是问题了：打字的是 agent。
+
+## 能做什么
+
+- **在手机上运行 agent。** Claude Code 通过本仓库的 glibc 包装运行；Antigravity CLI 有原生 Android 版本。
+- **用它们自己的 App 发指令。** 在 Termux 里启动 agent 并打开遥控，然后在同一台手机上用 Claude App 或 Antigravity 网页发提示词。
+- **在手机上直接开发 Android 应用。** agent 改代码、用 Gradle 编译、通过本机 adb 安装，再截图检查结果。
+- **让 agent 操作手机。** 用同一个 adb 连接，它可以打开任何 App、看屏幕、点击、打字。忙的时候它可以替你做完一节语言课保住连胜，或者把外卖订单准备好，停在结账页，最后一步由你自己点。
+
+下面这句提示词，两个 agent 都从头到尾完成了，提示词是从手机上它们各自的客户端发出的：
+
+> 打开 DoorDash，帮我在最近的糖水（Tong Sui）点一杯奶茶，种类你来选，停在结账页面。
+
+它们各自找到店、选好饮品、设好选项、到达结账页后停下，然后切回自己的客户端。
+
+## 快速上手
+
+**1. 安装一个 agent**（aarch64 的 Termux）：
+
+```sh
+# Claude Code
+pkg install -y git
+git clone https://github.com/hongdp/claude-termux.git
+cd claude-termux && bash install.sh
+claude                     # 第一次运行时执行 /login
+```
+
+Antigravity CLI 见 [docs/antigravity.zh-CN.md](docs/antigravity.zh-CN.md)，只需要一个安装脚本和一次浏览器登录。
+
+**2. 把 adb 连到手机自己。** 打开无线调试，配对并连接 `127.0.0.1`。步骤见 [docs/android-dev.zh-CN.md](docs/android-dev.zh-CN.md) 第 5 节。
+
+**3. 给 agent 一份说明。** 把 [phone/AGENTS.zh-CN.md](phone/AGENTS.zh-CN.md) 复制到启动 agent 的目录里（Claude Code 用 `CLAUDE.md` 这个名字），并填好关于你这台手机的一节。
+
+**4. 提一个要求。** 先从小事开始，比如“打开设置，告诉我 Android 版本”，看着它怎么做。
 
 ## 支持的 agent
 
@@ -17,29 +52,32 @@
 | Claude Code | 官方 `linux-arm64` 二进制，由本仓库的 `install.sh` 改成使用 Termux 的 glibc | Claude App | [见下文](#termux-里的-claude-code) |
 | Antigravity CLI（`agy`，Gemini） | 官方原生 Android 二进制 | 浏览器里的网页 | [docs/antigravity.zh-CN.md](docs/antigravity.zh-CN.md) |
 
-其他 agent 没有在这里测试过。只要它能在 Termux 里运行、能执行 `adb`、能看 PNG 图片，下面这套工具应该就能用。
+其他 agent 没有在这里测试过。只要它能在 Termux 里运行、能执行 `adb`、能看 PNG 图片，这套操作手机的工具应该就能用。
 
-## 操作手机
+## 指南和工具
 
-用无线调试把 Termux 里的 `adb` 连到手机自己，把 [phone/AGENTS.zh-CN.md](phone/AGENTS.zh-CN.md) 放进 agent 的目录，然后直接提要求：
+| | |
+| --- | --- |
+| [docs/phone-automation.zh-CN.md](docs/phone-automation.zh-CN.md) | 操作 App：准备工作、“看、想、做”的循环、遥控、折叠屏分屏、实测结果，以及一路上踩过的坑 |
+| [docs/android-dev.zh-CN.md](docs/android-dev.zh-CN.md) | 在手机上编译、安装、调试 Android 应用 |
+| [docs/antigravity.zh-CN.md](docs/antigravity.zh-CN.md) | Termux 里的 Antigravity CLI：安装、权限、记忆、遥控 |
+| [phone/AGENTS.zh-CN.md](phone/AGENTS.zh-CN.md) | 给 agent 的说明模板（[English](phone/AGENTS.md)） |
+| [phone/act.sh](phone/act.sh) | 执行点击、滑动、粘贴，屏幕一稳定就返回 |
 
-> 打开 DoorDash，帮我在最近的糖水（Tong Sui）点一杯奶茶，种类你来选，停在结账页面。
+## 把手机交给 agent 之前
 
-两个测试过的 agent 都完成了这件事：提示词从手机上发出，它们停在结账页，然后切回自己的客户端。Claude Code（Sonnet 5.5）用了大约一分半钟；Antigravity CLI（Gemini 4 Hydrogen）用了大约五分钟。两者各跑了一次，条件略有不同。
+agent 是用你的账号、在你的手机上操作。
 
-- [docs/phone-automation.zh-CN.md](docs/phone-automation.zh-CN.md)：准备工作、“看、想、做”的循环、遥控、折叠屏分屏，以及一路上踩过的坑。
-- [phone/AGENTS.zh-CN.md](phone/AGENTS.zh-CN.md)：给 agent 的说明模板（[English](phone/AGENTS.md)）。
-- [phone/act.sh](phone/act.sh)：执行点击、滑动、粘贴，屏幕一稳定就返回。
-
-agent 是用你的账号、在你的手机上操作。模板要求它在花钱或给别人发东西之前停下；请保留这条规则，看着它操作，并遵守各个 App 的用户协议。
-
-## 在手机上开发 Android 应用
-
-有了 Termux、Gradle 和同一个本机 adb 连接，agent 可以在手机上跑完整的“改代码 → 编译 → 安装 → 截图验证”循环。完整指南：[docs/android-dev.zh-CN.md](docs/android-dev.zh-CN.md)。
+- 说明模板要求它在花钱或给别人发东西之前停下。请保留这条规则。
+- 看着它操作，至少在你信得过某类任务之前。折叠屏和平板可以用分屏，让终端一直显示在 App 旁边。
+- 很多 App 的用户协议不允许自动化使用。请把这套方法用在自己的实验、测试和无障碍需求上。
+- 只在一台设备上测试过：Pixel 10 Pro Fold，Android 17。其他手机可能要做些小改动，比如屏幕 ID。
 
 ## Termux 里的 Claude Code
 
-### 为什么需要这个
+本页余下部分说明 Claude Code 是怎么在 Termux 里跑起来的，以及如何更新和卸载。
+
+### 为什么需要包装
 
 - npm 包 `@anthropic-ai/claude-code` 只是个安装器，真正的程序是按平台下载的预编译二进制。安装器里写了 `linux-arm64-android` 这个平台，但 npm 上没有对应的包（截至 2.1.332）。
 - Termux 用的是 Android 的 bionic libc，官方 `linux-arm64` 二进制要的是 glibc（`/lib/ld-linux-aarch64.so.1`），直接跑会失败。

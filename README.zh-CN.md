@@ -1,6 +1,6 @@
 <div align="center">
 
-# claude-termux
+# termux-agent-kit
 
 **在安卓手机上原生运行 AI 编程 agent，并让它们操作这台手机。**
 
@@ -43,7 +43,7 @@ Claude Code 和 Antigravity CLI，跑在 Termux 里。不用 root，不用 proot
 
 </div>
 
-原速完整录像：[Claude Code，约 2 分钟](https://github.com/hongdp/claude-termux/releases/download/demo-videos/claude-code-demo.mp4) · [Antigravity CLI，约 6 分钟](https://github.com/hongdp/claude-termux/releases/download/demo-videos/antigravity-cli-demo.mp4)
+原速完整录像：[Claude Code，约 2 分钟](https://github.com/hongdp/termux-agent-kit/releases/download/demo-videos/claude-code-demo.mp4) · [Antigravity CLI，约 6 分钟](https://github.com/hongdp/termux-agent-kit/releases/download/demo-videos/antigravity-cli-demo.mp4)
 
 ## 起因
 
@@ -83,8 +83,8 @@ apt-get update && apt-get full-upgrade -y
 pkg install -y git android-tools termux-api tmux
 
 # 2. 安装一个 agent（这里是 Claude Code；Antigravity CLI 见 docs/antigravity.zh-CN.md）
-git clone https://github.com/hongdp/claude-termux.git
-cd claude-termux && bash install.sh
+git clone https://github.com/hongdp/termux-agent-kit.git
+cd termux-agent-kit && bash install.sh
 
 # 3. 把 adb 连到手机自己：在开发者选项里打开无线调试。
 #    输入配对码时用分屏让配对弹窗一直开着；

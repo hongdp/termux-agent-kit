@@ -20,6 +20,7 @@ Claude Code 和 Antigravity CLI，跑在 Termux 里。不用 root，不用 proot
 
 ## 目录
 
+- [演示](#演示)
 - [起因](#起因)
 - [功能](#功能)
 - [环境要求](#环境要求)
@@ -31,6 +32,18 @@ Claude Code 和 Antigravity CLI，跑在 Termux 里。不用 root，不用 proot
 - [仓库结构](#仓库结构)
 - [参与贡献](#参与贡献)
 - [许可证与声明](#许可证与声明)
+
+## 演示
+
+<div align="center">
+
+<img src="docs/media/demo-claude-code.gif" alt="运行在 Termux 里的 Claude Code 从 Claude App 收到提示词，打开 DoorDash，找到店铺，选好饮品，停在结账页面" width="300">
+
+*Claude Code 从同一台手机上的 Claude App 收到提示词，在 DoorDash 里点单，并停在结账页。画面为 6 倍速，个人信息已打码。*
+
+</div>
+
+原速完整录像：[Claude Code，约 2 分钟](https://github.com/hongdp/claude-termux/releases/download/demo-videos/claude-code-demo.mp4) · [Antigravity CLI，约 6 分钟](https://github.com/hongdp/claude-termux/releases/download/demo-videos/antigravity-cli-demo.mp4)
 
 ## 起因
 
@@ -142,6 +155,7 @@ shim-bash               给 Claude Code 的 Bash 工具用的 shell 转接脚本
 phone/AGENTS.md         给任何 agent 用的说明模板（另有中文版）
 phone/act.sh            执行点击、滑动、粘贴，屏幕稳定后返回
 docs/                   各篇指南，均有英文和简体中文版
+docs/media/             本页用到的演示 GIF
 ```
 
 ## 参与贡献

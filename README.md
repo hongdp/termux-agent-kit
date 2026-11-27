@@ -20,6 +20,7 @@ English | [简体中文](README.zh-CN.md)
 
 ## Contents
 
+- [Demo](#demo)
 - [Why](#why)
 - [Features](#features)
 - [Requirements](#requirements)
@@ -31,6 +32,18 @@ English | [简体中文](README.zh-CN.md)
 - [Repository layout](#repository-layout)
 - [Contributing](#contributing)
 - [License and disclaimer](#license-and-disclaimer)
+
+## Demo
+
+<div align="center">
+
+<img src="docs/media/demo-claude-code.gif" alt="Claude Code, running in Termux, receives a prompt in the Claude app, opens DoorDash, finds the store, picks a drink and stops at the checkout page" width="300">
+
+*Claude Code takes a prompt from the Claude app on the same phone, orders in DoorDash and stops at checkout. Shown at 6x speed; personal details are blurred.*
+
+</div>
+
+Full recordings in real time: [Claude Code, about 2 min](https://github.com/hongdp/claude-termux/releases/download/demo-videos/claude-code-demo.mp4) · [Antigravity CLI, about 6 min](https://github.com/hongdp/claude-termux/releases/download/demo-videos/antigravity-cli-demo.mp4)
 
 ## Why
 
@@ -141,6 +154,7 @@ shim-bash               Shell shim for Claude Code's Bash tool
 phone/AGENTS.md         Instruction template for any agent (also in zh-CN)
 phone/act.sh            Run taps, swipes and pastes, return when the screen settles
 docs/                   Guides, each in English and Simplified Chinese
+docs/media/             Demo GIF used in this README
 ```
 
 ## Contributing

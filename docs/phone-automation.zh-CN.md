@@ -10,7 +10,7 @@ Termux 里的 `adb` 连上手机本身以后，运行在 Termux 里的编程 age
 
 ## 准备
 
-先按 [android-dev.zh-CN.md](android-dev.zh-CN.md) 第 5 节，通过无线调试把 `adb` 配对并连接到 `127.0.0.1`。然后查屏幕 ID，折叠屏需要它：
+先按 [setup.zh-CN.md](setup.zh-CN.md) 做一遍：它包含 Termux、agent、把 `adb` 和手机自己配对、说明文件，每一步后面都有检查。折叠屏还要查屏幕 ID：
 
 ```sh
 adb shell dumpsys SurfaceFlinger --display-id

@@ -30,13 +30,19 @@ pkg install -y git android-tools termux-api tmux
 
 **Check:** `termux-clipboard-set hello && termux-clipboard-get` prints `hello`. If it hangs, the Termux:API app is missing or from a different source.
 
-## 3. Install an agent
+## 3. Get this repo and install an agent
+
+Both agents use files from this repo (the instruction template and `act.sh`), so clone it first:
+
+```sh
+git clone https://github.com/hongdp/claude-termux.git
+cd claude-termux
+```
 
 **Claude Code:**
 
 ```sh
-git clone https://github.com/hongdp/claude-termux.git
-cd claude-termux && bash install.sh
+bash install.sh            # in the claude-termux folder
 claude                     # run /login the first time
 ```
 
@@ -77,13 +83,13 @@ If the file starts with `[Warning] Multiple displays were found`, the phone has 
 Start the agent in its own project folder, not in your home directory.
 
 ```sh
-mkdir -p ~/projects/phone ~/bin
-cp phone/AGENTS.md ~/projects/phone/AGENTS.md      # run from the claude-termux folder
-cp phone/AGENTS.md ~/projects/phone/CLAUDE.md      # Claude Code reads CLAUDE.md
-cp phone/act.sh ~/bin/act.sh
+# run from the claude-termux folder
+mkdir -p ~/projects/phone
+cp phone/AGENTS.md phone/act.sh ~/projects/phone/
+ln -s AGENTS.md ~/projects/phone/CLAUDE.md      # Claude Code reads CLAUDE.md; one file to edit
 ```
 
-Edit the "This phone" section at the end of the file: your display id if you have one, and the apps you expect to use.
+Edit the "This phone" section at the end of `~/projects/phone/AGENTS.md`: your display id if you have one, and the apps you expect to use.
 
 ## 6. First run
 
@@ -121,13 +127,12 @@ The agent can't act while the screen is locked, and Android may stop Termux in t
 
 | What you see | Cause | What to do |
 | --- | --- | --- |
-| Rotation lock keeps turning itself off | `adb shell monkey` turns auto-rotate on when it exits | Launch apps with `adb shell am start -n <pkg>/<activity>` |
 | Typed text is wrong, or doesn't appear in the field | `input text` goes through the keyboard app: autocorrect changes it, and a non-Latin input mode swallows it | Paste instead: `termux-clipboard-set "text"; adb shell input keyevent 279` |
 | The agent's session stops by itself | A key event landed on the agent's own client; `keyevent 111` (Escape) presses its stop button | Never send `keyevent 111` |
 | `claude remote-control`: "Workspace not trusted" | Started in the home directory, where trust is never saved | Use a project folder and run `claude` there once first |
 | `grep` or `find` fail in Claude Code's Bash tool with `invalid ELF header` | The built-in replacements re-run the glibc binary with Termux's `LD_PRELOAD` | Use `command grep` and `command find` |
 | The agent takes minutes on a long list | `uiautomator dump` takes 10 s or more while the screen animates | Tell it to use screenshots and the app's own search (the template does) |
-| Taps seem to be ignored | The app was still animating | Use `act.sh`, or wait about a second between taps |
+| Taps seem to be ignored | The app was still animating | Use `./act.sh`, or wait about a second between taps |
 | Screenshot file contains `Multiple displays were found` | More than one display | Add `-d <display id>` |
 | `adb devices` is empty after a reboot | The connect port changed | `adb connect 127.0.0.1:<new port>` |
 | `agy` asks before every command | No sandbox on Android, so auto mode is unavailable | See [antigravity.md](antigravity.md#permissions-on-android) |

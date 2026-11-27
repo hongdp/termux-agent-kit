@@ -9,9 +9,10 @@
 # Settle detection: hash a raw screencap every ~0.3 s; done when two
 # consecutive hashes match after the screen first changed (or never changed
 # within 1.5 s). Prints timing and saves the final screenshot to $OUT.
-# Env: ANDROID_SERIAL, DISPLAY_ID, OUT (default $TMPDIR/act.png)
+# Env: ANDROID_SERIAL, DISPLAY_ID, OUT (default $TMPDIR/act.png),
+#      REGION="x0 x1" (only watch these screen columns; see below)
 set -u
-OUT=${OUT:-$TMPDIR/act.png}
+OUT=${OUT:-${TMPDIR:-${PREFIX:-/data/data/com.termux/files/usr}/tmp}/act.png}
 WANT_UI=0; MAX=8
 while getopts "ut:" o; do case $o in u) WANT_UI=1 ;; t) MAX=$OPTARG ;; *) exit 2 ;; esac; done
 shift $((OPTIND - 1))
@@ -28,16 +29,20 @@ if [ -n "${REGION:-}" ]; then
 	read -r W H <<<"$(adb exec-out screencap $D | head -c 8 | od -An -tu4)"
 	ROWS=$(seq $((H / 36)) $((H / 20)) $((H - 12)) | tr '\n' ' ')
 	hash() { adb shell "screencap $D > /data/local/tmp/act.raw && for r in $ROWS; do dd if=/data/local/tmp/act.raw bs=4 skip=\$((4 + r*$W + $RX0)) count=$((RX1 - RX0)) 2>/dev/null; done | md5sum" 2>/dev/null | cut -c1-12; }
+	trap 'adb shell rm -f /data/local/tmp/act.raw 2>/dev/null' EXIT
 else
 	hash() { adb shell "screencap $D | md5sum" 2>/dev/null | cut -c1-12; }
 fi
 
 T0=$(now)
 before=$(hash)
+[ -n "$before" ] || { echo "act.sh: could not read the screen. Is adb connected? (adb devices)" >&2; exit 1; }
 while [ $# -gt 0 ]; do
 	case $1 in
 	tap) adb shell input tap "$2" "$3"; shift 3 ;;
-	swipe) adb shell input swipe "$2" "$3" "$4" "$5" "${6:-300}"; [ $# -ge 6 ] && [[ $6 =~ ^[0-9]+$ ]] && shift 6 || shift 5 ;;
+	swipe) # the duration is optional; without this check the next action's name would be sent as the duration
+		if [ $# -ge 6 ] && [[ $6 =~ ^[0-9]+$ ]]; then adb shell input swipe "$2" "$3" "$4" "$5" "$6"; shift 6
+		else adb shell input swipe "$2" "$3" "$4" "$5" 300; shift 5; fi ;;
 	key) adb shell input keyevent "$2"; shift 2 ;;
 	paste) printf '%s' "$2" | termux-clipboard-set; adb shell input keyevent 279; printf '' | termux-clipboard-set; shift 2 ;;
 	sleep) sleep "$2"; shift 2 ;;

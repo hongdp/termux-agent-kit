@@ -27,7 +27,7 @@ case "${1:-}" in
 		exit 0
 		;;
 	--rollback)
-		prev="$(installed | grep -vxF "$cur" | tail -1)"
+		prev="$(installed | grep -vxF "$cur" | tail -1 || true)"
 		[[ -n "$prev" ]] || { echo "no other installed version" >&2; exit 1; }
 		ln -sfn "$prev" "$ROOT/current"
 		echo "switched $cur -> $prev"

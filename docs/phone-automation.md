@@ -45,11 +45,11 @@ When the dump works, the text list is often enough to act on. Go back to the scr
 Actions:
 
 ```sh
-adb shell input tap X Y            # tap (coordinates from look.sh)
+adb shell input tap X Y            # tap (screen pixel coordinates)
 termux-clipboard-set "hello"; adb shell input keyevent 279   # type by pasting (see below)
 adb shell input swipe X1 Y1 X2 Y2 300
 adb shell input keyevent BACK
-adb shell am start -n <pkg>/<activity>   # do not use monkey to launch apps (see below)
+adb shell am start -n <pkg>/<activity>
 ```
 
 ## Give the agent its instructions
@@ -58,12 +58,12 @@ The agent needs to know how to operate the phone and where to stop. [phone/AGENT
 
 ## act.sh: act, then wait for the screen
 
-[phone/act.sh](../phone/act.sh) runs one or more actions and returns as soon as the screen stops changing, with a fresh screenshot. It replaces fixed `sleep`s, which are either too short (taps get lost) or too long.
+[phone/act.sh](../phone/act.sh) (copied next to the instruction file during [setup](setup.md)) runs one or more actions and returns as soon as the screen stops changing, with a fresh screenshot. It replaces fixed `sleep`s, which are either too short (taps get lost) or too long.
 
 ```sh
-phone/act.sh tap 540 1200                       # tap, wait until the screen settles, screenshot
-phone/act.sh tap 540 300 paste "milk tea" key 66
-phone/act.sh -u swipe 540 1800 540 600          # -u also prints the UI element list
+./act.sh tap 540 1200                       # tap, wait until the screen settles, screenshot
+./act.sh tap 540 300 paste "milk tea" key 66
+./act.sh -u swipe 540 1800 540 600          # -u also prints the UI element list
 ```
 
 In a four-step run through the Settings app it took 28.8 s, against 47.8 s for separate tap, sleep and screenshot commands.
@@ -99,7 +99,7 @@ adb shell dumpsys activity service SystemUIService WMShell splitscreen moveToSid
 adb shell dumpsys activity service SystemUIService WMShell splitscreen exitSplitScreen <taskId>   # undo
 ```
 
-On the Pixel 10 Pro Fold's inner display this gives Termux x 0–1026 and the app x 1050–2076. `uiautomator` still reports screen coordinates, so `look.sh` and `input tap` work unchanged.
+On the Pixel 10 Pro Fold's inner display this gives Termux x 0–1026 and the app x 1050–2076. `uiautomator` still reports screen coordinates, so `look.sh` and `input tap` work unchanged. With `act.sh`, set `REGION="1050 2076"` (the app's columns) so that Termux's own spinner on the other half doesn't count as the screen still changing.
 
 - **Mainly useful on foldables and tablets.** On a regular phone, half the screen is too narrow for most apps, so take over the full screen and switch back to Termux afterwards instead.
 - **Watch the keyboard.** While Termux has focus, its soft keyboard covers the bottom part of *both* halves, which is often exactly where an app's Continue/Check buttons are. Check the screenshot before tapping low on the screen, or collapse the keyboard first.
@@ -109,9 +109,8 @@ On the Pixel 10 Pro Fold's inner display this gives Termux x 0–1026 and the ap
 - **Wait between taps.** Many apps animate after each tap and drop taps that arrive mid-animation. In matching exercises, taps 0.6 s apart were partly lost, while 1.3 s apart worked every time. After a batch of taps, run `look.sh` again to confirm the state instead of assuming.
 - **Never blind-tap through screens you haven't read.** After the lesson, a loop that kept tapping the bottom-center button ran through reward and upsell screens (gift gems, a free trial, "add friends to your family plan"), and it was no longer clear which choice each tap had made. Read every non-routine screen and tap the button by its text.
 - **`uiautomator dump` doesn't see everything.** Content drawn in a canvas or game view shows up as one big node. Use the screenshot for those.
-- **Coordinates are screen pixels.** `uiautomator` bounds and `input tap` use the same coordinate space, but a downscaled screenshot preview does not, so take coordinates from the dump.
+- **Coordinates are screen pixels.** `uiautomator` bounds and `input tap` use the same coordinate space, but a downscaled screenshot preview does not. When you read a position off a screenshot, convert it back to full-resolution pixels before tapping; when you need exact coordinates, take them from a dump.
 - **Without split screen, the app takes over the screen.** You can't use the phone while Claude drives it, and switching away mid-run makes Claude tap the wrong app. Switch back to Termux at the end with `adb shell am start -n com.termux/.app.TermuxActivity`. On a foldable or tablet, use split screen (above).
-- **Don't launch apps with `monkey`.** `adb shell monkey -p <pkg> ...` is a handy launcher, but when it exits it turns auto-rotate on (on a foldable, for the current fold state too). The user's rotation lock kept coming undone until every launch was changed to `am start -n <pkg>/<activity>`.
 - **Type by pasting.** `input text` goes through the keyboard app. Autocorrect turned "Tang Shui" into "Tango Shui", and in a Chinese input mode the text ended up in the composing bar instead of the field. Setting the clipboard and sending `keyevent 279` (paste) avoids both.
 - **Prefer screenshots to `uiautomator dump` for speed.** A dump takes 10 seconds or more while anything on screen animates. One run spent over three minutes dumping a long menu page by page; with screenshots and the app's own search, the same task took a minute and a half.
 - **Some apps block screenshots** (`FLAG_SECURE`, common in banking and payment apps): screenshots come back black. `uiautomator` may still see the elements.

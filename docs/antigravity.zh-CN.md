@@ -45,7 +45,7 @@ Android 上不能用 `--mode auto`：它依赖终端沙箱，这里没有，`agy
 
 ```sh
 pkg install -y tmux
-tmux new -s agy -c ~/projects/phone-demo 'agy --remote-control --model gemini-4-hydrogen-high'
+tmux new -s agy -c ~/projects/phone 'agy --remote-control --model gemini-4-hydrogen-high'
 # Ctrl+b d 放到后台；tmux attach -t agy 回来
 ```
 

@@ -132,4 +132,3 @@ cd ~/projects/phone && claude remote-control --name phone
 | 重启后 `adb devices` 是空的 | 连接端口变了 | `adb connect 127.0.0.1:<新端口>` |
 | `agy` 每条命令都要确认 | Android 上没有沙箱，不能用 auto 模式 | 见 [antigravity.zh-CN.md](antigravity.zh-CN.md) |
 | 装完包之后 `curl` 坏了 | 升级只做了一半，libcurl 和 openssl 版本不一致 | `apt-get full-upgrade` |
-| 第二次跑和第一次表现不一样 | 上一次留下了痕迹，比如购物车里还有商品 | 重复任务前先把 App 恢复原样 |

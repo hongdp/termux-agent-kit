@@ -18,7 +18,11 @@ adb shell dumpsys SurfaceFlinger --display-id
 
 ## The loop: look, decide, act
 
-Each step Claude takes a screenshot and a UI dump, decides on an action, and runs it. This helper does the "look" part. It saves a screenshot and prints every element that has text, a content description or is clickable, together with its tap center in screen pixels:
+Each step the agent looks at the screen, decides on an action, and runs it.
+
+**Look with a screenshot by default.** `adb exec-out screencap -p > $TMPDIR/s.png` takes well under a second and shows everything a person would see, including icons, images and web content.
+
+**Add a UI dump when you need it.** `uiautomator dump` lists the elements on screen as text, with exact tap coordinates, and costs fewer tokens than an image. But it takes 10 seconds or more while anything on screen is animating, and it sees almost nothing inside canvas, game or web views. Use it for a static screen where you need precise coordinates or want to read a lot of text. This helper saves a screenshot and prints every element that has text, a content description or is clickable, together with its tap center in screen pixels:
 
 ```sh
 #!/data/data/com.termux/files/usr/bin/bash
@@ -36,7 +40,7 @@ function attr(s,n){ if (match(s, n "=\"[^\"]*\"")) return substr(s,RSTART+length
   printf "%-38s | %-22s | %-24s %s (%d,%d)\n", substr(t,1,38), substr(d,1,22), substr(id,1,24), (c=="true"?"CLICK":""), (p[2]+p[4])/2, (p[3]+p[5])/2 }'
 ```
 
-The text list is usually enough to act on, and it costs far fewer tokens than reading the screenshot. Claude only needs to look at the screenshot when the list is ambiguous, such as icon-only buttons, game-like screens or checking a result.
+When the dump works, the text list is often enough to act on. Go back to the screenshot when the list is ambiguous, such as icon-only buttons or game-like screens, and to check a result.
 
 Actions:
 
@@ -82,7 +86,7 @@ Same prompt both times, sent from the client on the phone: "Open DoorDash, order
 | Claude Code | Sonnet 5.5, high | Claude app | Reached checkout, did not order | about 1.5 min |
 | Antigravity CLI 1.5.18 | Gemini 4 Hydrogen, high | Web page in Chrome | Reached checkout, did not order | about 5 min |
 
-Treat the times as rough. Each agent ran once, the Gemini run started with an item already in the cart, and it explored more of the menu before choosing. An earlier Claude run on a larger model took over four minutes because it tried to read the whole menu with `uiautomator dump`; the instruction file now says not to.
+Each agent ran once, so treat the times as rough.
 
 ## Split screen: keep Termux visible (foldables and tablets)
 
@@ -110,7 +114,6 @@ On the Pixel 10 Pro Fold's inner display this gives Termux x 0–1026 and the ap
 - **Don't launch apps with `monkey`.** `adb shell monkey -p <pkg> ...` is a handy launcher, but when it exits it turns auto-rotate on (on a foldable, for the current fold state too). The user's rotation lock kept coming undone until every launch was changed to `am start -n <pkg>/<activity>`.
 - **Type by pasting.** `input text` goes through the keyboard app. Autocorrect turned "Tang Shui" into "Tango Shui", and in a Chinese input mode the text ended up in the composing bar instead of the field. Setting the clipboard and sending `keyevent 279` (paste) avoids both.
 - **Prefer screenshots to `uiautomator dump` for speed.** A dump takes 10 seconds or more while anything on screen animates. One run spent over three minutes dumping a long menu page by page; with screenshots and the app's own search, the same task took a minute and a half.
-- **Clean up before a repeat run.** A leftover item in a shopping cart changes what the next run sees, and the agent has to decide what to do about it.
 - **Some apps block screenshots** (`FLAG_SECURE`, common in banking and payment apps): screenshots come back black. `uiautomator` may still see the elements.
 - **Audio is out of reach.** Claude can't hear the phone, so anything that depends on sound needs a text alternative.
 

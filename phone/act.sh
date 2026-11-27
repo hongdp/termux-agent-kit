@@ -20,11 +20,13 @@ now() { date +%s%N; }
 ms() { echo $(( ($(now) - $1) / 1000000 )); }
 # REGION="x0 x1" limits change detection to those columns (e.g. the app's half in
 # split screen, so Termux's own spinner doesn't count as "still changing").
-# Rows are sampled (~20) because each row slice costs one dd on the device.
+# About 20 rows are sampled, spread over the real screen height, because each row
+# slice costs one dd on the device.
 if [ -n "${REGION:-}" ]; then
 	read -r RX0 RX1 <<<"$REGION"
-	W=$(adb exec-out screencap $D | head -c 4 | od -An -tu4 | tr -d ' ')
-	ROWS=$(seq 60 105 2140 | tr '\n' ' ')
+	# Raw screencap header: width and height as 32-bit integers, then pixel data from byte 16.
+	read -r W H <<<"$(adb exec-out screencap $D | head -c 8 | od -An -tu4)"
+	ROWS=$(seq $((H / 36)) $((H / 20)) $((H - 12)) | tr '\n' ' ')
 	hash() { adb shell "screencap $D > /data/local/tmp/act.raw && for r in $ROWS; do dd if=/data/local/tmp/act.raw bs=4 skip=\$((4 + r*$W + $RX0)) count=$((RX1 - RX0)) 2>/dev/null; done | md5sum" 2>/dev/null | cut -c1-12; }
 else
 	hash() { adb shell "screencap $D | md5sum" 2>/dev/null | cut -c1-12; }

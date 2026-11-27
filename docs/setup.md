@@ -132,4 +132,3 @@ The agent can't act while the screen is locked, and Android may stop Termux in t
 | `adb devices` is empty after a reboot | The connect port changed | `adb connect 127.0.0.1:<new port>` |
 | `agy` asks before every command | No sandbox on Android, so auto mode is unavailable | See [antigravity.md](antigravity.md#permissions-on-android) |
 | `curl` breaks after installing packages | A partial upgrade left libcurl and openssl out of sync | `apt-get full-upgrade` |
-| A second run behaves differently from the first | State left behind, such as an item in a cart | Reset the app's state before repeating a task |

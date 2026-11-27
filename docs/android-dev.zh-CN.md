@@ -10,7 +10,7 @@
 
 ## 0. 前提
 
-- Termux（aarch64），已经按本仓库 README 装好 `claude`。
+- Termux（aarch64），已经按 [claude-code.zh-CN.md](claude-code.zh-CN.md) 装好 `claude`。
 - 至少 3 GB 空闲存储：Android SDK 约 1 GB，Gradle 缓存和依赖约 1–2 GB。
 - 内存：Gradle 默认 `-Xmx4g`。编译前最好关掉后台 App，否则可能被系统杀掉。
 - 项目里不能有原生代码（NDK / CMake / Rust）。原生部分本文没有覆盖，见文末。
@@ -185,7 +185,7 @@ am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage
 
 ## 7. 和 Claude Code 一起用时的已知问题
 
-- Claude 的 Bash 工具会把 `grep`、`find` 换成内置的 ugrep、bfs。在本仓库的 glibc 方案下，`shim-bash` 恢复了 `LD_PRELOAD`，这两个内置工具会报 `libc.so: invalid ELF header`。改用 `command grep`、`command find` 就行，详见 README。
+- Claude 的 Bash 工具会把 `grep`、`find` 换成内置的 ugrep、bfs。在本仓库的 glibc 方案下，`shim-bash` 恢复了 `LD_PRELOAD`，这两个内置工具会报 `libc.so: invalid ELF header`。改用 `command grep`、`command find` 就行，详见 [claude-code.zh-CN.md](claude-code.zh-CN.md)。
 - 不要用 `pkill -f <模式>` 停后台进程：模式字符串也会出现在 Claude 自己的命令行里，会把这条命令自己也杀掉（exit 144）。用 PID 停。
 
 ## 没覆盖到的

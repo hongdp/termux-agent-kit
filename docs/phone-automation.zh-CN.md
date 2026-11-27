@@ -4,9 +4,9 @@
 
 Termux 里的 `adb` 连上手机本身以后，运行在 Termux 里的编程 agent 就能像人一样操作任何 App：看屏幕，想下一步，然后点击、滑动、打字。不用 root，不用无障碍服务，也不用装别的 App。只要 agent 能执行 shell 命令、能读图片就行；本文用 Claude Code 和 Antigravity CLI（Gemini）测试过，下文的“Claude”可以换成你用的任何一个 agent。
 
-在 Pixel 10 Pro Fold（Android 17）上实测过：Claude 打开 Duolingo，找到当前进行中的课，从头做到尾，翻译、配对、填空、打字题一道没错。听力题和口语题用 App 自带的「现在不方便听/说」按钮跳过了，因为 Claude 听不到声音，也没法说话。拿来测试很有意思，拿来学习就不行了：连胜是保住了，可学到东西的只有模型。不建议这么做。
+在 Pixel 10 Pro Fold（Android 17）上实测过：Claude 打开 Duolingo，找到当前进行中的课，从头做到尾，翻译、配对、填空、打字题一道没错。听力题和口语题用 App 自带的「现在不方便听/说」按钮跳过了，因为 Claude 听不到声音，也没法说话。拿来测试很有意思，拿来学习就不行了：连续天数是保住了，可学到东西的只有模型。不建议这么做。
 
-> 请遵守各个 App 的用户协议。很多 App 不允许用自动化程序使用它的服务，这套方法请用在自己的实验、测试和无障碍需求上，不要拿来刷分刷奖励。付款、转账、替你给别人发消息这类操作，不要让 Claude 在你没逐步确认的情况下做。
+> 请遵守各个 App 的用户协议。很多 App 不允许用自动化程序使用它的服务，这套方法适合自己做实验、做测试，或者用于无障碍需求，不要拿来刷分刷奖励。付款、转账、替你给别人发消息这类操作，不要让 Claude 在你没逐步确认的情况下做。
 
 ## 准备
 
@@ -71,7 +71,7 @@ phone/act.sh -u swipe 540 1800 540 600          # -u 同时打印界面元素列
 - **Claude Code**：在项目目录里运行 `claude remote-control`（先在这个目录运行一次 `claude`，接受信任提示），然后在 Claude App 里选这台设备新建会话。
 - **Antigravity CLI**：在 `tmux` 里运行 `agy --remote-control`，然后在浏览器里打开它打印的链接。见 [antigravity.zh-CN.md](antigravity.zh-CN.md)。
 
-有两点要知道。agent 的客户端和它操作的 App 轮流占用屏幕，所以要告诉 agent 停下时切回来（模板里写了）。另外，误落在客户端上的点击或按键会把会话停掉：`keyevent 111`（Esc）两次按中了 Claude App 的停止按钮。
+有两点要注意。agent 的客户端和它操作的 App 轮流占用屏幕，所以要告诉 agent 停下时切回来（模板里写了）。另外，点击或按键如果误落在客户端上，会把会话停掉：`keyevent 111`（Esc）两次按中了 Claude App 的停止按钮。
 
 ## 实测结果
 
@@ -82,7 +82,7 @@ phone/act.sh -u swipe 540 1800 540 600          # -u 同时打印界面元素列
 | Claude Code | Sonnet 5.5，high | Claude App | 到达结账页，没有下单 | 约 1.5 分钟 |
 | Antigravity CLI 1.5.18 | Gemini 4 Hydrogen，high | Chrome 里的网页 | 到达结账页，没有下单 | 约 5 分钟 |
 
-用时只能粗略参考。每个 agent 只跑了一次；Gemini 那次开始时购物车里已经有一件商品，而且它选之前把菜单看得更多。更早一次用更大的 Claude 模型花了四分多钟，因为它想用 `uiautomator dump` 把整个菜单读一遍；现在说明文件里写了不要这样做。
+用时只能粗略参考。每个 agent 只跑了一次；Gemini 那次开始时购物车里已经有一件商品，而且它在做选择前翻看了更多菜单。更早一次用更大的 Claude 模型花了四分多钟，因为它想用 `uiautomator dump` 把整个菜单读一遍；现在说明文件里写了不要这样做。
 
 ## 分屏：让 Termux 一直留在屏幕上（折叠屏、平板）
 
@@ -112,7 +112,7 @@ adb shell dumpsys activity service SystemUIService WMShell splitscreen exitSplit
 - **想快就用截图，少用 `uiautomator dump`。** 屏幕上有动画时，一次 dump 要 10 秒以上。有一次为了读一个很长的菜单，逐页 dump 花了三分多钟；改用截图加 App 自带的搜索后，同样的任务只用了一分半。
 - **重复跑之前先清理现场。** 购物车里留着上一次的商品，会改变下一次看到的内容，agent 还得决定怎么处理它。
 - **有些 App 禁止截屏**（`FLAG_SECURE`，银行、支付类常见），截出来是黑的，但 `uiautomator` 可能仍然读得到元素。
-- **声音碰不到。** Claude 听不到手机发出的声音，依赖声音的操作需要有文字替代方案。
+- **声音处理不了。** Claude 听不到手机发出的声音，依赖声音的操作需要有文字替代方案。
 
 ## 限制
 

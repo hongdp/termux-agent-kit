@@ -16,7 +16,7 @@
 3. 包装脚本 `claude`：
    - 启动前去掉 `LD_PRELOAD`。Termux 的 bionic termux-exec 留着的话，glibc 加载器会报 `libc.so: invalid ELF header` 退出。
    - 把原来的值存到 `CLAUDE_TERMUX_LD_PRELOAD`，再用 `CLAUDE_CODE_SHELL` 指向 `shim-bash`。这样 Claude 的 Bash 工具执行命令时会恢复 termux-exec，`#!/usr/bin/env ...` 这类脚本能正常运行。
-   - 设置 `DISABLE_AUTOUPDATER=1`。自带的自动更新会下载没 patch 过、跑不起来的版本，所以 `claude update` / `claude install` 被转去用 `claude-termux-update`。
+   - 设置 `DISABLE_AUTOUPDATER=1`。自带的自动更新会下载没打过补丁、跑不起来的版本，所以 `claude update` / `claude install` 被转去用 `claude-termux-update`。
 
 ## 安装
 
@@ -66,8 +66,8 @@ claude update                     # 等同于 claude-termux-update
 | --- | --- |
 | `install.sh` | 安装依赖，部署下面三个文件，然后下载并激活一个版本 |
 | `claude` | 包装脚本，装到 `$PREFIX/bin/claude` |
-| `claude-termux-update` | 下载、校验、patch、切换版本，装到 `$PREFIX/bin/` |
-| `shim-bash` | 给 Bash 工具用的 bash 垫片，装到 `~/.local/share/claude-native/shim/bash` |
+| `claude-termux-update` | 下载、校验、打补丁、切换版本，装到 `$PREFIX/bin/` |
+| `shim-bash` | 给 Bash 工具用的 bash 转接脚本，装到 `~/.local/share/claude-native/shim/bash` |
 
 ## 卸载
 

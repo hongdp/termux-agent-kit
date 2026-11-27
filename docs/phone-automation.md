@@ -10,7 +10,7 @@ Tested on a Pixel 10 Pro Fold (Android 17): Claude opened a language-learning ap
 
 ## Setup
 
-Pair and connect `adb` to `127.0.0.1` through Wireless debugging first; see section 5 of [android-dev.md](android-dev.md#5-local-adb-the-phone-connects-to-itself). Then find the display id (needed on foldables):
+Follow [setup.md](setup.md) first: it covers Termux, the agent, pairing `adb` with the phone itself and the instruction file, with a check after each step. On a foldable, also find the display id:
 
 ```sh
 adb shell dumpsys SurfaceFlinger --display-id

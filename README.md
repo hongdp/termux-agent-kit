@@ -49,9 +49,20 @@ claude update                     # 等同于 claude-termux-update
 
 - ✅ `claude --version`、`claude auth status`，以及 `claude doctor`（API 和登录服务器连通、内置搜索正常）
 - ✅ 安装、切换版本、回滚
-- ⏳ 登录后的交互界面、Bash 工具与 `shim-bash`、hooks、MCP：还没测
+- ✅ 登录后的交互界面、长对话、后台任务
+- ✅ Bash 工具与 `shim-bash`：termux-exec 恢复正常，`./gradlew`（`#!/bin/sh`）这类脚本能直接运行
+- ⚠️ Bash 工具里的 `grep` / `find`：见下方「已知问题」
+- ⏳ hooks、MCP：还没测
 
 `claude doctor` 会提示 `~/.local/bin` 不在 PATH 里、"install method unknown"。这是因为没走官方安装器，可以忽略。
+
+### 已知问题
+
+- Claude Code 会在 Bash 工具里把 `grep`、`find` 替换成内置的 ugrep、bfs，实际是用 argv0 重新执行 claude 本体。因为 `shim-bash` 恢复了 bionic 的 `LD_PRELOAD`，glibc 版 claude 一启动就报 `error while loading shared libraries: .../glibc/lib/libc.so: invalid ELF header`。临时办法是改用 `command grep`、`command find`；你在 Termux 里自己用的 `grep` 不受影响。环境变量 `EMBEDDED_SEARCH_TOOLS=0` 实测无效。要根治，需要在启动内置工具时去掉 `LD_PRELOAD`。
+
+## 在手机上开发 Android 应用
+
+用 Termux + Gradle + 本机 adb（无线调试），可以在手机上编译、安装、调试 Android 应用，Claude Code 能自己完成「改代码 → 编译 → 安装 → 截屏验证」整个循环。完整攻略见 [docs/android-dev.md](docs/android-dev.md)。
 
 ## 文件
 

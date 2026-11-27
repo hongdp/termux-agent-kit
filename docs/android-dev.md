@@ -10,7 +10,7 @@ No root and no computer needed.
 
 ## 0. Prerequisites
 
-- Termux (aarch64) with `claude` installed as described in this repo's README.
+- Termux (aarch64) with `claude` installed as described in [claude-code.md](claude-code.md).
 - At least 3 GB of free storage: about 1 GB for the Android SDK and 1–2 GB for Gradle caches and dependencies.
 - Memory: Gradle defaults to `-Xmx4g`. Close background apps before building, or the system may kill the build.
 - The project must not contain native code (NDK / CMake / Rust). Native code is not covered here; see the end of this guide.
@@ -185,7 +185,7 @@ am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage
 
 ## 7. Known issues when used with Claude Code
 
-- Claude's Bash tool replaces `grep` and `find` with its embedded ugrep and bfs. With this repo's glibc setup, `shim-bash` restores `LD_PRELOAD` and those two tools fail with `libc.so: invalid ELF header`. Use `command grep` and `command find` instead; see the README.
+- Claude's Bash tool replaces `grep` and `find` with its embedded ugrep and bfs. With this repo's glibc setup, `shim-bash` restores `LD_PRELOAD` and those two tools fail with `libc.so: invalid ELF header`. Use `command grep` and `command find` instead; see [claude-code.md](claude-code.md).
 - Don't stop background processes with `pkill -f <pattern>`: the pattern also appears in Claude's own command line, so the command kills itself (exit 144). Stop processes by PID.
 
 ## Not covered

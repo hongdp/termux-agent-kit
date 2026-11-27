@@ -43,7 +43,7 @@ Termux 很多年前就能做这类事，但在手机上敲命令行实在太难�
 - **agent 跑在手机上。** Claude Code 通过本仓库的 glibc 包装运行；Antigravity CLI 有原生 Android 版本。
 - **用 agent 自己的 App 发指令。** 在 Termux 里启动 agent 并打开遥控，然后在同一台手机上用 Claude App 或 Antigravity 网页和它对话。
 - **在手机上开发 Android 应用。** agent 改代码、用 Gradle 编译、通过本机 adb 安装，再截图检查结果。
-- **手机自动化。** 用同一个 adb 连接，agent 可以打开任何 App、看屏幕、点击、打字。它可以把外卖订单准备好，停在结账页，最后一步由你自己点。忙的时候它甚至能替你做完当天的 Duolingo 保住连胜。（不建议这么做：猫头鹰是满意了，可你一个词也没学到。）
+- **手机自动化。** 用同一个 adb 连接，agent 可以打开任何 App、看屏幕、点击、打字。它可以把外卖订单准备好，停在结账页，最后一步由你自己点。忙的时候，它甚至能替你把当天的 Duolingo 做完，连续天数就不会断。（不建议这么做：猫头鹰是满意了，可你一个词也没学到。）
 
 下面这句提示词，两个 agent 都从头到尾完成了，提示词是从手机上它们各自的客户端发出的：
 
@@ -62,7 +62,7 @@ Termux 很多年前就能做这类事，但在手机上敲命令行实在太难�
 
 ## 快速上手
 
-这是精简版。[docs/setup.zh-CN.md](docs/setup.zh-CN.md) 里有完整步骤，每一步后面都有检查。
+下面是精简版。[docs/setup.zh-CN.md](docs/setup.zh-CN.md) 里有完整步骤，每一步后面都有检查。
 
 ```sh
 # 1. 安装依赖
@@ -83,7 +83,7 @@ mkdir -p ~/projects/phone && cp phone/AGENTS.zh-CN.md ~/projects/phone/CLAUDE.md
 cd ~/projects/phone && claude
 ```
 
-先提一个小要求试试：
+先让它做一件小事试试：
 
 > 打开设置，告诉我这台手机的 Android 版本，然后切回 Termux。
 
@@ -108,16 +108,16 @@ cd ~/projects/phone && claude
 
 ## 把手机交给 agent 之前
 
-agent 是用你的账号、在你的手机上操作。
+agent 用的是你的账号，操作的是你的手机。
 
 - 说明模板要求它在花钱或给别人发东西之前停下。请保留这条规则。
-- 看着它操作，至少在你信得过某类任务之前。折叠屏和平板可以用分屏，让终端一直显示在 App 旁边。
-- 很多 App 的用户协议不允许自动化使用。请把这套方法用在自己的实验、测试和无障碍需求上。
+- 刚开始最好全程看着它操作，等你对某类任务放心了再放手。折叠屏和平板可以用分屏，让终端一直显示在 App 旁边。
+- 很多 App 的用户协议不允许自动化使用。这套方法适合自己做实验、做测试，或者用于无障碍需求。
 - 只在一台设备上测试过：Pixel 10 Pro Fold，Android 17。其他手机可能要做些小改动，比如屏幕 ID。
 
 ## 常见问题
 
-这里是最先会遇到的几个。完整的对照表在 [docs/setup.zh-CN.md](docs/setup.zh-CN.md#踩坑对照表)。
+下面是最容易先碰到的几个问题。完整的对照表在 [docs/setup.zh-CN.md](docs/setup.zh-CN.md#踩坑对照表)。
 
 | 现象 | 怎么办 |
 | --- | --- |
@@ -133,7 +133,7 @@ agent 是用你的账号、在你的手机上操作。
 install.sh              安装 Termux 版 Claude Code（glibc、打过补丁的二进制、包装脚本）
 claude                  包装脚本，安装到 $PREFIX/bin/claude
 claude-termux-update    更新、列出版本、回滚
-shim-bash               给 Claude Code 的 Bash 工具用的 shell 垫片
+shim-bash               给 Claude Code 的 Bash 工具用的 shell 转接脚本
 phone/AGENTS.md         给任何 agent 用的说明模板（另有中文版）
 phone/act.sh            执行点击、滑动、粘贴，屏幕稳定后返回
 docs/                   各篇指南，均有英文和简体中文版
@@ -143,7 +143,7 @@ docs/                   各篇指南，均有英文和简体中文版
 
 欢迎提 issue 和 pull request。目前最有用的贡献是：
 
-- **设备反馈。** 在你的手机和 Android 版本上，哪些能用、哪些不能用。
+- **设备反馈。** 你的手机型号和 Android 版本，以及哪些能用、哪些不能用。
 - **其他 agent。** 在 Termux 里运行另一个编程 agent 的步骤，以及你测试过什么。
 - **踩坑记录。** 你遇到的问题和解决办法，可以加进 [docs/setup.zh-CN.md](docs/setup.zh-CN.md#踩坑对照表) 的对照表。
 

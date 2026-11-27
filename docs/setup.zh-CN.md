@@ -2,9 +2,9 @@
 
 [English](setup.md) | 简体中文
 
-从一台普通安卓手机，到 agent 跑在 Termux 里并能操作这台手机，需要的步骤都在这里，按顺序做。每一步结尾都有一个检查，确认成功了再往下走。文末的[踩坑对照表](#踩坑对照表)列出了我们遇到过的问题和避开的办法。
+从一台普通安卓手机，到 agent 跑在 Termux 里并能操作这台手机，需要的步骤都在这里，按顺序做。每一步最后都有一项检查，确认没问题再往下走。文末的[踩坑对照表](#踩坑对照表)列出了我们遇到过的问题和避开的办法。
 
-测试设备是 Pixel 10 Pro Fold（Android 17，aarch64）。其他手机应该也能用，可能有差异的地方文中会说明。
+测试设备是 Pixel 10 Pro Fold（Android 17，aarch64）。其他手机应该也能用，可能不一样的地方文中会提到。
 
 ## 1. 需要准备什么
 
@@ -20,7 +20,7 @@
 在 Termux 里：
 
 ```sh
-apt-get update && apt-get full-upgrade -y     # 让所有包的版本对齐
+apt-get update && apt-get full-upgrade -y     # 把所有包升级到互相匹配的版本
 pkg install -y git android-tools termux-api tmux
 ```
 
@@ -91,7 +91,7 @@ cp phone/act.sh ~/bin/act.sh
 cd ~/projects/phone && claude        # 或者：agy
 ```
 
-接受目录信任提示，然后试一个无害的要求：
+接受目录信任提示，然后先让它做一件不会出岔子的小事：
 
 > 打开设置，告诉我这台手机的 Android 版本，然后切回 Termux。
 
@@ -126,7 +126,7 @@ adb shell screenrecord --time-limit 0 /sdcard/Movies/demo.mp4     # Ctrl+C 停�
 - 折叠屏在折叠状态下不要加 `--display-id`：传内屏的 ID 会报 `UNASSIGNED_LAYER_STACK`。
 - 干净的状态栏：`adb shell settings put global sysui_demo_allowed 1`，然后 `adb shell am broadcast -a com.android.systemui.demo -e command enter`。退出用 `-e command exit`。
 - 显示触点：`adb shell settings put system show_touches 1`（录完改回 `0`）。
-- **分享前先打码。** 录真实 App 会拍到你的地址、名字、搜索历史、账号头像和其他会话。切换 App 的动画里画面会滑动，在静止画面上盖住某个字段的遮罩，可能有几帧盖不住；转场要逐帧检查。
+- **分享前先打码。** 录屏会把你的地址、名字、搜索历史、账号头像和其他会话都录进去。切换 App 的动画里画面会滑动，在静止画面上盖住某个字段的遮罩，可能有几帧盖不住；转场要逐帧检查。
 
 ## 踩坑对照表
 
@@ -143,4 +143,4 @@ adb shell screenrecord --time-limit 0 /sdcard/Movies/demo.mp4     # Ctrl+C 停�
 | 重启后 `adb devices` 是空的 | 连接端口变了 | `adb connect 127.0.0.1:<新端口>` |
 | `agy` 每条命令都要确认 | Android 上没有沙箱，不能用 auto 模式 | 见 [antigravity.zh-CN.md](antigravity.zh-CN.md) |
 | 装完包之后 `curl` 坏了 | 升级只做了一半，libcurl 和 openssl 版本不一致 | `apt-get full-upgrade` |
-| 第二次跑和第一次表现不一样 | 上一次留下了状态，比如购物车里的商品 | 重复任务前先把 App 的状态清掉 |
+| 第二次跑和第一次表现不一样 | 上一次留下了痕迹，比如购物车里还有商品 | 重复任务前先把 App 恢复原样 |

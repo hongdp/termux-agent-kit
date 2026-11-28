@@ -161,6 +161,8 @@ docs/media/             Demo GIF used in this README
 
 ## Related projects
 
+**The same thing as an app.** [agent-kit-app](https://github.com/hongdp/agent-kit-app), by the same author, turns this guide into one Android app: a fork of Termux with buttons for installing the agents, signing in, pairing adb and keeping remote control on, so that none of it needs a terminal. It is still in development and has no release yet.
+
 Other people are working on the same idea from different angles. If this repo doesn't fit your setup, one of these may:
 
 - [termux-coding-agents](https://github.com/bobbymac/termux-coding-agents) runs Claude Code and other agents in Termux with a different technique that also covers the Google Play build of Termux and keeps Claude Code's own updater. `phone/adb-connect.sh` here follows the port-discovery approach of its `adb-local`.

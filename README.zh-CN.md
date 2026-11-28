@@ -162,6 +162,8 @@ docs/media/             本页用到的演示 GIF
 
 ## 相关项目
 
+**同一件事的 App 版。** [agent-kit-app](https://github.com/hongdp/agent-kit-app) 是同一作者把这份指南做成的一个安卓 App：基于 Termux 的分支，安装 agent、登录、adb 配对、保持 remote control 都有按钮，全程不需要终端。目前还在开发中，尚未发布。
+
 还有其他人在从不同角度做同一件事。如果本仓库不适合你的环境，可以看看这些：
 
 - [termux-coding-agents](https://github.com/bobbymac/termux-coding-agents)：用另一种技术在 Termux 里运行 Claude Code 等 agent，支持 Google Play 版 Termux，并保留了 Claude Code 自带的更新功能。本仓库的 `phone/adb-connect.sh` 参考了它 `adb-local` 里发现端口的做法。

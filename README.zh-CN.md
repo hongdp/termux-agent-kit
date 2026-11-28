@@ -162,7 +162,7 @@ docs/media/             本页用到的演示 GIF
 
 ## 相关项目
 
-**同一件事的 App 版：点按钮，不用敲命令。** [agent-kit-app](https://github.com/hongdp/agent-kit-app) 是同一作者把这整份指南装进一个安卓 App 的成果。打开它，第一屏就把事情办完：每个 agent 一个按钮安装，登录在 App 里的页面完成，adb 在通知里输入配对码、之后自动重连，remote control 在后台一直开着、断了自己重启，手机上的 agent 随时能从 Claude App 或网页接上。剪贴板、通知这些命令是内置的，不用再装 Termux:API。它和 Termux 并存安装，可以把你在 Termux 里已有的环境导入过来，想用终端时终端也还在里面。第一个 APK 正在准备中，在那之前可以从源码构建。
+**同一件事的 App 版：点按钮，不用敲命令。** [agent-kit-app](https://github.com/hongdp/agent-kit-app) 是我们自己做的安卓 App，把这整份指南装了进去。打开它，第一屏就把事情办完：每个 agent 一个按钮安装，登录在 App 里的页面完成，adb 在通知里输入配对码、之后自动重连，remote control 在后台一直开着、断了自己重启，手机上的 agent 随时能从 Claude App 或网页接上。剪贴板、通知这些命令是内置的，不用再装 Termux:API。它和 Termux 并存安装，可以把你在 Termux 里已有的环境导入过来，想用终端时终端也还在里面。第一个 APK 正在准备中，在那之前可以从源码构建。
 
 还有其他人在从不同角度做同一件事。如果本仓库不适合你的环境，可以看看这些：
 

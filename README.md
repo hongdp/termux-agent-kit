@@ -161,7 +161,7 @@ docs/media/             Demo GIF used in this README
 
 ## Related projects
 
-**The same thing as an app.** [agent-kit-app](https://github.com/hongdp/agent-kit-app), by the same author, turns this guide into one Android app: a fork of Termux with buttons for installing the agents, signing in, pairing adb and keeping remote control on, so that none of it needs a terminal. It is still in development and has no release yet.
+**The same thing as an app: taps instead of commands.** [agent-kit-app](https://github.com/hongdp/agent-kit-app), by the same author, packs this whole guide into one Android app. Open it and the first screen does the work: one button installs each agent, signing in is a page in the app, adb pairs from a notification and reconnects by itself, and remote control stays on in the background and restarts when it drops, so the agent on your phone stays reachable from the Claude app or the web. Clipboard and notification commands are built in, with no Termux:API to install. It installs next to Termux, can import the setup you already have there, and still has the terminal inside for when you want one. The first APK is being prepared; until then you can build it from source.
 
 Other people are working on the same idea from different angles. If this repo doesn't fit your setup, one of these may:
 
